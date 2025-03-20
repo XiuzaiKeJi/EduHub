@@ -15,6 +15,17 @@ yarn-error.log
 *.swp
 *.swo
 
-# 系统
+# 操作系统
 .DS_Store
-Thumbs.db 
+Thumbs.db
+
+# 日志
+logs/
+*.log
+
+# 测试覆盖率
+coverage/
+
+# 构建输出
+dist/
+build/ 

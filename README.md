@@ -1,34 +1,76 @@
-# EduHub Development Environment
+# EduHub 教育平台
 
-这是一个基于 VS Code Remote Development 的开发环境配置。
+EduHub 是一个现代化的教育平台系统，提供在线课程管理、学习进度跟踪、师生互动等功能。
 
-## 环境要求
+## 功能特点
 
-- Docker Desktop
-- Visual Studio Code
-- VS Code Remote Development 扩展包
+- 用户认证与授权
+- 课程管理
+- 学习进度跟踪
+- 师生互动
+- 在线作业提交
+- 成绩管理
 
-## 使用方法
+## 技术栈
 
-1. 安装必要的软件和扩展
-2. 克隆此仓库
-3. 在 VS Code 中使用 "Remote-Containers: Open Folder in Container" 命令打开项目
-4. 等待容器构建完成
-5. 开始开发！
+- Node.js
+- Express.js
+- MongoDB
+- JWT 认证
+- RESTful API
 
-## 开发命令
+## 开始使用
 
-- `npm start`: 启动应用
-- `npm run dev`: 以开发模式启动应用（支持热重载）
-- `npm test`: 运行测试
+1. 克隆仓库
+```bash
+git clone https://github.com/XiuzaiKeJi/EduHub.git
+cd EduHub
+```
+
+2. 安装依赖
+```bash
+npm install
+```
+
+3. 配置环境变量
+```bash
+cp .env.example .env
+# 编辑 .env 文件，设置必要的环境变量
+```
+
+4. 启动开发服务器
+```bash
+npm run dev
+```
 
 ## 项目结构
 
 ```
-.
-├── .devcontainer/          # 开发容器配置
-│   ├── devcontainer.json   # VS Code 远程开发配置
-│   └── Dockerfile         # 开发环境 Docker 配置
-├── package.json           # 项目依赖和脚本
-└── README.md             # 项目文档
-``` 
+src/
+├── config/         # 配置文件
+├── controllers/    # 控制器
+├── models/        # 数据模型
+├── routes/        # 路由
+├── services/      # 业务逻辑
+├── utils/         # 工具函数
+└── app.js         # 应用入口
+```
+
+## 开发指南
+
+- 遵循 ESLint 规范
+- 编写单元测试
+- 提交前运行测试
+- 遵循 Git Flow 工作流
+
+## 贡献指南
+
+1. Fork 项目
+2. 创建特性分支
+3. 提交更改
+4. 推送到分支
+5. 创建 Pull Request
+
+## 许可证
+
+ISC 
