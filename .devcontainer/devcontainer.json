@@ -1,16 +1,21 @@
 {
-    "name": "EduHub Development Environment",
-    "dockerFile": "Dockerfile",
-    "forwardPorts": [3000],
+    "name": "EduHub Development",
+    "build": {
+        "dockerfile": "Dockerfile"
+    },
     "customizations": {
         "vscode": {
             "extensions": [
                 "dbaeumer.vscode-eslint",
                 "esbenp.prettier-vscode",
-                "ms-vscode.vscode-typescript-tslint-plugin"
+                "ms-vscode.vscode-node-azure-pack",
+                "christian-kohler.npm-intellisense",
+                "christian-kohler.path-intellisense",
+                "ms-azuretools.vscode-docker"
             ]
         }
     },
+    "forwardPorts": [3000],
     "postCreateCommand": "npm install",
     "remoteUser": "node"
 } 
