@@ -49,4 +49,15 @@ Thumbs.db
 
 # 上传文件
 uploads/
-public/uploads/ 
+public/uploads/
+
+# 开发环境
+.devcontainer/
+.vscode/
+
+# 文档（如果需要版本控制，请删除这一行）
+docs/
+
+# 临时目录
+temp/
+tmp/ 
