@@ -1,13 +1,17 @@
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
+import moment from 'moment';
 
 // 加载环境变量
 dotenv.config();
 
 const app = express();
-const port = process.env.PORT || 3001;
+const port = Number(process.env.PORT) || 3001;
 const host = '0.0.0.0'; // 添加host配置，监听所有网络接口
+
+// 设置中文
+moment.locale('zh-cn');
 
 // 中间件
 app.use(cors());
@@ -18,7 +22,7 @@ app.get('/api/v1/health', (req, res) => {
   res.json({
     status: 'success',
     message: '后端服务运行正常',
-    timestamp: new Date().toISOString(),
+    timestamp: moment().format('YYYY-MM-DD HH:mm:ss'),
     environment: process.env.NODE_ENV
   });
 });
