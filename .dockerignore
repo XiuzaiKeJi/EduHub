@@ -1,0 +1,44 @@
+# 依赖目录
+node_modules
+.pnpm-store
+
+# 构建输出
+dist
+build
+*.tsbuildinfo
+
+# 版本控制
+.git
+.gitignore
+.gitattributes
+
+# 编辑器配置
+.vscode
+.idea
+*.swp
+*.swo
+
+# 环境配置
+.env
+.env.*
+!.env.example
+
+# 日志文件
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# 测试覆盖率
+coverage
+
+# 系统文件
+.DS_Store
+Thumbs.db
+
+# 临时文件
+*.tmp
+*.temp
+.cache 

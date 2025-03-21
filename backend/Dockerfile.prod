@@ -1,0 +1,55 @@
+# 构建阶段
+FROM node:18-alpine as builder
+
+WORKDIR /app
+
+# 安装构建工具
+RUN apk add --no-cache git python3 make g++
+
+# 设置时区
+ENV TZ=Asia/Shanghai
+RUN apk add --no-cache tzdata
+
+# 安装 pnpm
+RUN npm install -g pnpm
+
+# 复制项目文件
+COPY package.json pnpm-lock.yaml ./
+RUN pnpm install --frozen-lockfile
+
+COPY . .
+
+# 构建项目
+RUN pnpm build
+
+# 生产阶段
+FROM node:18-alpine
+
+WORKDIR /app
+
+# 安装生产依赖
+RUN apk add --no-cache sqlite tzdata
+
+# 设置时区
+ENV TZ=Asia/Shanghai
+RUN cp /usr/share/zoneinfo/$TZ /etc/localtime && \
+    echo $TZ > /etc/timezone
+
+# 安装 pnpm
+RUN npm install -g pnpm
+
+# 复制构建产物和必要文件
+COPY --from=builder /app/dist ./dist
+COPY package.json pnpm-lock.yaml ./
+RUN pnpm install --frozen-lockfile --prod
+
+# 创建数据目录
+RUN mkdir -p /app/data
+
+EXPOSE 3001
+
+# 健康检查
+HEALTHCHECK --interval=30s --timeout=3s \
+    CMD wget -q --spider http://localhost:3001/api/v1/health || exit 1
+
+CMD ["node", "dist/app.js"] 

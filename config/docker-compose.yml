@@ -1,0 +1,57 @@
+version: '3.8'
+
+services:
+  frontend:
+    build:
+      context: ../frontend
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"  # Vite 开发服务器
+      - "24678:24678" # Vite HMR
+    volumes:
+      - ../frontend:/app
+      - frontend_node_modules:/app/node_modules
+      - pnpm_store:/root/.local/share/pnpm/store
+    environment:
+      - NODE_ENV=development
+      - VITE_API_URL=http://localhost:3001
+    command: sh -c "pnpm install && pnpm dev --host 0.0.0.0"
+    depends_on:
+      - backend
+
+  backend:
+    build:
+      context: ../backend
+      dockerfile: Dockerfile
+    ports:
+      - "3001:3001"  # API 服务器
+      - "9229:9229"  # Node.js 调试端口
+    volumes:
+      - ../backend:/app
+      - backend_node_modules:/app/node_modules
+      - pnpm_store:/root/.local/share/pnpm/store
+      - sqlite_data:/app/data
+    environment:
+      - NODE_ENV=development
+      - PORT=3001
+      - DB_PATH=/app/data/eduhub.db
+      - JWT_SECRET=your-jwt-secret-key
+      - API_SECRET=your-api-secret-key
+    command: sh -c "pnpm install && pnpm start:dev"
+
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "8080:80"
+    volumes:
+      - ../config/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ../frontend/dist:/usr/share/nginx/html:ro
+    depends_on:
+      - frontend
+      - backend
+
+volumes:
+  frontend_node_modules:
+  backend_node_modules:
+  pnpm_store:
+  sqlite_data:
