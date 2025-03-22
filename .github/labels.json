@@ -1,32 +1,37 @@
 [
   {
+    "name": "test",
+    "color": "0075ca",
+    "description": "测试相关"
+  },
+  {
     "name": "feature",
-    "color": "0E8A16",
-    "description": "新功能开发"
+    "color": "a2eeef",
+    "description": "新功能"
   },
   {
     "name": "bug",
-    "color": "D93F0B",
-    "description": "程序缺陷"
+    "color": "d73a4a",
+    "description": "需要修复的问题"
   },
   {
     "name": "technical",
-    "color": "1D76DB",
-    "description": "技术改进"
+    "color": "006b75",
+    "description": "技术相关"
   },
   {
     "name": "priority:high",
-    "color": "B60205",
+    "color": "d93f0b",
     "description": "高优先级"
   },
   {
     "name": "priority:medium",
-    "color": "FFA500",
+    "color": "fbca04",
     "description": "中优先级"
   },
   {
     "name": "priority:low",
-    "color": "FBCA04",
+    "color": "0e8a16",
     "description": "低优先级"
   },
   {
