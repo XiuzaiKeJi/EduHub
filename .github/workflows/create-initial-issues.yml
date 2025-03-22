@@ -3,6 +3,10 @@ name: 创建初始Issues
 on:
   workflow_dispatch:
 
+permissions:
+  issues: write
+  contents: read
+
 jobs:
   create-issues:
     runs-on: ubuntu-latest
