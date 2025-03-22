@@ -1,0 +1,153 @@
+name: 创建初始Issues
+
+on:
+  workflow_dispatch:
+
+jobs:
+  create-issues:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      
+      - name: 创建用户认证系统Issue
+        uses: actions/github-script@v6
+        with:
+          script: |
+            await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: 'feat: 实现用户认证系统 - 数据库设计',
+              body: `## 描述
+用户认证系统的数据库设计，包括用户表、角色表和权限表的设计与实现。
+
+## 验收标准
+- [ ] 用户表设计完成
+  - 基本信息字段
+  - 认证相关字段
+  - 状态字段
+- [ ] 角色表设计完成
+  - 角色基本信息
+  - 角色层级关系
+- [ ] 权限表设计完成
+  - 权限定义
+  - 权限分类
+- [ ] 关联表设计完成
+  - 用户-角色关联
+  - 角色-权限关联
+- [ ] 建表SQL脚本完成
+- [ ] 初始数据SQL脚本完成
+
+## 技术要点
+- 使用SQLite数据库
+- 密码需要使用bcrypt加密存储
+- 需要考虑索引优化
+- 需要支持软删除
+- 需要添加创建时间和更新时间字段
+
+## 预估工时
+2天
+
+## 相关文档
+- [数据库设计规范](docs/DATABASE.md)
+- [用户认证系统设计文档](docs/AUTH.md)`,
+              labels: ['feature', 'priority:high']
+            });
+
+      - name: 创建任务管理系统Issue
+        uses: actions/github-script@v6
+        with:
+          script: |
+            await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: 'feat: 实现任务管理系统 - 数据库设计',
+              body: `## 描述
+任务管理系统的数据库设计，包括任务表、任务状态表和任务分配表的设计与实现。
+
+## 验收标准
+- [ ] 任务表设计完成
+  - 任务基本信息
+  - 任务状态流转
+  - 任务关联关系
+- [ ] 任务状态表设计完成
+  - 状态定义
+  - 状态流转规则
+- [ ] 任务分配表设计完成
+  - 任务-用户关联
+  - 任务-部门关联
+- [ ] 任务评论表设计完成
+- [ ] 任务附件表设计完成
+- [ ] 建表SQL脚本完成
+
+## 技术要点
+- 使用SQLite数据库
+- 需要支持任务状态流转
+- 需要支持任务关联关系
+- 需要考虑任务查询性能
+- 需要添加创建时间和更新时间字段
+
+## 预估工时
+2天
+
+## 相关文档
+- [数据库设计规范](docs/DATABASE.md)
+- [任务管理系统设计文档](docs/TASK.md)`,
+              labels: ['feature', 'priority:medium']
+            });
+
+      - name: 创建基础开发环境Issue
+        uses: actions/github-script@v6
+        with:
+          script: |
+            await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: 'chore: 搭建基础开发环境',
+              body: `## 描述
+搭建和配置项目所需的基础开发环境和工具链。
+
+## 实施计划
+1. 配置代码规范工具
+   - [ ] 配置ESLint
+   - [ ] 配置Prettier
+   - [ ] 配置TypeScript
+   - [ ] 配置EditorConfig
+
+2. 配置测试框架
+   - [ ] 配置Jest
+   - [ ] 配置测试覆盖率报告
+   - [ ] 添加示例测试
+
+3. 配置CI/CD
+   - [ ] 配置GitHub Actions
+   - [ ] 设置自动化测试
+   - [ ] 设置自动化部署
+
+4. 配置日志系统
+   - [ ] 集成Winston
+   - [ ] 配置日志级别
+   - [ ] 配置日志输出格式
+
+## 技术细节
+- ESLint + Prettier：代码规范和格式化
+- Jest：单元测试框架
+- GitHub Actions：CI/CD流程
+- Winston：日志框架
+
+## 测试计划
+- [ ] 验证ESLint规则是否生效
+- [ ] 验证Prettier格式化是否正常
+- [ ] 验证测试用例是否能正常运行
+- [ ] 验证CI/CD流程是否正常
+- [ ] 验证日志记录是否正常
+
+## 预估工时
+3天
+
+## 影响分析
+- 代码质量提升
+- 开发效率提升
+- 部署流程优化
+- 问题追踪能力提升`,
+              labels: ['technical', 'priority:high']
+            }); 
