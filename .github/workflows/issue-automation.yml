@@ -114,15 +114,24 @@ jobs:
             const issue = context.payload.issue;
             if (!issue) return;
             
-            // 将新Issue添加到项目看板
-            // 注意：需要替换为实际的项目ID
-            const projectId = 'YOUR_PROJECT_ID';
+            // 使用GraphQL API添加Issue到项目
+            const addToProject = `
+              mutation($projectId: ID!, $contentId: ID!) {
+                addProjectV2ItemById(input: {projectId: $projectId, contentId: $contentId}) {
+                  item {
+                    id
+                  }
+                }
+              }
+            `;
             
             try {
-              await github.rest.projects.createCard({
-                column_id: 'TO_DO_COLUMN_ID',
-                content_id: issue.id,
-                content_type: 'Issue'
+              // 替换为实际的项目ID
+              const projectId = 'PVT_kwDOLXXXXX';  // 请将此处替换为实际的项目ID
+              
+              await github.graphql(addToProject, {
+                projectId: projectId,
+                contentId: issue.node_id
               });
             } catch (error) {
               console.log('Error adding issue to project:', error);
