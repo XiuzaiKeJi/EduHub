@@ -1,0 +1,70 @@
+name: Bug报告
+description: 用于报告系统问题或错误
+title: "fix: "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        感谢您报告这个问题！请提供以下信息以帮助我们更快地定位和解决问题。
+
+  - type: textarea
+    id: bug-description
+    attributes:
+      label: 问题描述
+      description: 请详细描述您遇到的问题
+      placeholder: 清晰地描述发生了什么问题
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduction-steps
+    attributes:
+      label: 复现步骤
+      description: 请列出复现这个问题的具体步骤
+      placeholder: |
+        1. 进入页面 '...'
+        2. 点击按钮 '...'
+        3. 滚动到 '...'
+        4. 出现错误
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected-behavior
+    attributes:
+      label: 预期行为
+      description: 请描述正常情况下应该是什么样的
+      placeholder: 描述应该发生什么
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual-behavior
+    attributes:
+      label: 实际行为
+      description: 请描述实际发生了什么
+      placeholder: 描述实际发生的情况
+    validations:
+      required: true
+
+  - type: input
+    id: version
+    attributes:
+      label: 版本信息
+      description: 问题发生在哪个版本
+      placeholder: "例如：v1.0.0"
+    validations:
+      required: true
+
+  - type: textarea
+    id: additional-info
+    attributes:
+      label: 其他信息
+      description: 其他可能有助于解决问题的信息
+      placeholder: |
+        - 浏览器版本
+        - 操作系统
+        - 错误日志
+    validations:
+      required: false 

@@ -1,0 +1,63 @@
+name: 功能开发
+description: 用于创建新功能开发任务
+title: "feat: "
+labels: ["feature"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        感谢您创建新的功能开发任务！请填写以下信息以帮助我们更好地理解和追踪任务进展。
+  
+  - type: textarea
+    id: description
+    attributes:
+      label: 功能描述
+      description: 请详细描述这个功能的目标和范围
+      placeholder: 这个功能是为了解决什么问题？它将如何帮助用户？
+    validations:
+      required: true
+
+  - type: textarea
+    id: acceptance-criteria
+    attributes:
+      label: 验收标准
+      description: 列出完成这个功能需要满足的具体标准
+      placeholder: |
+        - [ ] 标准1
+        - [ ] 标准2
+        - [ ] 标准3
+    validations:
+      required: true
+
+  - type: textarea
+    id: technical-points
+    attributes:
+      label: 技术要点
+      description: 列出实现这个功能需要注意的技术细节
+      placeholder: |
+        - 使用的技术栈
+        - 需要注意的性能问题
+        - 安全性考虑
+    validations:
+      required: true
+
+  - type: input
+    id: estimated-time
+    attributes:
+      label: 预估工时
+      description: 预计完成这个功能需要多少工作时间
+      placeholder: "例如：2天"
+    validations:
+      required: true
+
+  - type: textarea
+    id: related-docs
+    attributes:
+      label: 相关文档
+      description: 列出与这个功能相关的文档链接
+      placeholder: |
+        - 设计文档：
+        - API文档：
+        - 其他相关文档：
+    validations:
+      required: false 
