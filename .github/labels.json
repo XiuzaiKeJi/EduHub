@@ -35,19 +35,34 @@
     "description": "低优先级"
   },
   {
-    "name": "status:blocked",
-    "color": "D93F0B",
-    "description": "被阻塞"
+    "name": "status:backlog",
+    "color": "c5def5",
+    "description": "待处理"
+  },
+  {
+    "name": "status:todo",
+    "color": "fbca04",
+    "description": "准备开始"
   },
   {
     "name": "status:in-progress",
-    "color": "0E8A16",
+    "color": "0e8a16",
     "description": "进行中"
   },
   {
     "name": "status:review",
-    "color": "1D76DB",
+    "color": "1d76db",
     "description": "待审查"
+  },
+  {
+    "name": "status:blocked",
+    "color": "d93f0b",
+    "description": "被阻塞"
+  },
+  {
+    "name": "status:done",
+    "color": "0e8a16",
+    "description": "已完成"
   },
   {
     "name": "enhancement",
