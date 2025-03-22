@@ -1,0 +1,78 @@
+name: 技术任务
+description: 用于创建技术改进、重构、架构等任务
+title: "chore: "
+labels: ["technical"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        请填写以下信息以帮助我们更好地理解和追踪技术任务的进展。
+  
+  - type: textarea
+    id: description
+    attributes:
+      label: 任务描述
+      description: 请详细描述这个技术任务的目标和范围
+      placeholder: |
+        - 当前存在什么技术问题？
+        - 为什么需要这个改进？
+        - 预期带来什么好处？
+    validations:
+      required: true
+
+  - type: textarea
+    id: implementation-plan
+    attributes:
+      label: 实施计划
+      description: 列出实现这个技术任务的具体步骤
+      placeholder: |
+        1. 步骤1
+        2. 步骤2
+        3. 步骤3
+    validations:
+      required: true
+
+  - type: textarea
+    id: technical-details
+    attributes:
+      label: 技术细节
+      description: 描述实现这个任务需要注意的技术细节
+      placeholder: |
+        - 使用的技术栈和工具
+        - 需要修改的核心代码
+        - 潜在的风险点
+    validations:
+      required: true
+
+  - type: textarea
+    id: testing-plan
+    attributes:
+      label: 测试计划
+      description: 描述如何验证这个技术改进
+      placeholder: |
+        - 单元测试覆盖
+        - 性能测试指标
+        - 集成测试范围
+    validations:
+      required: true
+
+  - type: input
+    id: estimated-time
+    attributes:
+      label: 预估工时
+      description: 预计完成这个任务需要多少工作时间
+      placeholder: "例如：3天"
+    validations:
+      required: true
+
+  - type: textarea
+    id: impact-analysis
+    attributes:
+      label: 影响分析
+      description: 这个技术改进可能带来的影响
+      placeholder: |
+        - 对现有功能的影响
+        - 对性能的影响
+        - 对维护性的影响
+    validations:
+      required: true 
