@@ -1,0 +1,70 @@
+name: Issue 自动化
+
+on:
+  issues:
+    types: [opened, edited, closed, reopened]
+  pull_request:
+    types: [opened, closed]
+
+jobs:
+  triage:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: 自动标签
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const issue = context.payload.issue;
+            if (!issue) return;
+            
+            // 根据标题添加标签
+            const title = issue.title.toLowerCase();
+            const labels = [];
+            
+            if (title.startsWith('feat:')) {
+              labels.push('enhancement');
+              labels.push('feature');
+            }
+            else if (title.startsWith('fix:')) {
+              labels.push('bug');
+            }
+            else if (title.startsWith('chore:')) {
+              labels.push('technical');
+            }
+            
+            // 添加优先级标签
+            if (title.includes('urgent') || title.includes('紧急')) {
+              labels.push('priority:high');
+            }
+            
+            if (labels.length > 0) {
+              await github.rest.issues.addLabels({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issue.number,
+                labels: labels
+              });
+            }
+
+      - name: 自动项目看板
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const issue = context.payload.issue;
+            if (!issue) return;
+            
+            // 将新Issue添加到项目看板
+            // 注意：需要替换为实际的项目ID
+            const projectId = 'YOUR_PROJECT_ID';
+            
+            try {
+              await github.rest.projects.createCard({
+                column_id: 'TO_DO_COLUMN_ID',
+                content_id: issue.id,
+                content_type: 'Issue'
+              });
+            } catch (error) {
+              console.log('Error adding issue to project:', error);
+            } 
