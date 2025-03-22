@@ -1,0 +1,82 @@
+name: Sprint规划
+
+on:
+  workflow_dispatch:
+    inputs:
+      sprint_number:
+        description: 'Sprint编号'
+        required: true
+        default: '1'
+      start_date:
+        description: 'Sprint开始日期 (YYYY-MM-DD)'
+        required: true
+        default: '2024-03-21'
+      end_date:
+        description: 'Sprint结束日期 (YYYY-MM-DD)'
+        required: true
+        default: '2024-04-04'
+
+permissions:
+  issues: write
+  pull-requests: write
+
+jobs:
+  planning:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Sprint规划
+        uses: actions/github-script@v6
+        with:
+          script: |
+            // 创建里程碑
+            const milestone = await github.rest.issues.createMilestone({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: `Sprint ${context.payload.inputs.sprint_number}`,
+              due_on: `${context.payload.inputs.end_date}T23:59:59Z`,
+              description: `Sprint ${context.payload.inputs.sprint_number} (${context.payload.inputs.start_date} - ${context.payload.inputs.end_date})`
+            });
+
+            // 获取所有未分配里程碑的Issues
+            const issues = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              milestone: 'none',
+              state: 'open'
+            });
+
+            // 将Issues分配到新的里程碑
+            for (const issue of issues.data) {
+              await github.rest.issues.update({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issue.number,
+                milestone: milestone.data.number
+              });
+            }
+
+            // 创建项目看板
+            const createProject = `
+              mutation($name: String!, $ownerId: ID!) {
+                createProjectV2(input: {title: $name, ownerId: $ownerId}) {
+                  projectV2 {
+                    id
+                  }
+                }
+              }
+            `;
+
+            const projectName = `EduHub Sprint ${context.payload.inputs.sprint_number} (${context.payload.inputs.start_date} - ${context.payload.inputs.end_date})`;
+            
+            try {
+              const result = await github.graphql(createProject, {
+                name: projectName,
+                ownerId: context.repo.owner
+              });
+              
+              console.log(`Created project: ${result.projectV2.id}`);
+            } catch (error) {
+              console.log('Error creating project:', error);
+            } 
