@@ -1,0 +1,22 @@
+name: 同步Issue标签
+
+on:
+  push:
+    paths:
+      - '.github/labels.json'
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  sync-labels:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      
+      - name: 同步标签
+        uses: micnncim/action-label-syncer@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          manifest: .github/labels.json 

@@ -1,0 +1,62 @@
+[
+  {
+    "name": "feature",
+    "color": "0E8A16",
+    "description": "新功能开发"
+  },
+  {
+    "name": "bug",
+    "color": "D93F0B",
+    "description": "程序缺陷"
+  },
+  {
+    "name": "technical",
+    "color": "1D76DB",
+    "description": "技术改进"
+  },
+  {
+    "name": "priority:high",
+    "color": "B60205",
+    "description": "高优先级"
+  },
+  {
+    "name": "priority:medium",
+    "color": "FFA500",
+    "description": "中优先级"
+  },
+  {
+    "name": "priority:low",
+    "color": "FBCA04",
+    "description": "低优先级"
+  },
+  {
+    "name": "status:blocked",
+    "color": "D93F0B",
+    "description": "被阻塞"
+  },
+  {
+    "name": "status:in-progress",
+    "color": "0E8A16",
+    "description": "进行中"
+  },
+  {
+    "name": "status:review",
+    "color": "1D76DB",
+    "description": "待审查"
+  },
+  {
+    "name": "enhancement",
+    "color": "84B6EB",
+    "description": "功能增强"
+  },
+  {
+    "name": "documentation",
+    "color": "0075CA",
+    "description": "文档相关"
+  },
+  {
+    "name": "good first issue",
+    "color": "7057FF",
+    "description": "适合新手的任务"
+  }
+] 
