@@ -88,14 +88,13 @@ const handleSubmit = async () => {
     await formRef.value.validate();
     loading.value = true;
 
-    const success = await authStore.login(formData.email, formData.password);
-    if (success) {
-      ElMessage.success('登录成功');
-      const redirectPath = route.query.redirect as string || '/dashboard';
-      router.push(redirectPath);
-    }
+    await authStore.login(formData.email, formData.password);
+    await authStore.fetchUserInfo();
+    ElMessage.success('登录成功');
+    const redirectPath = route.query.redirect as string || '/dashboard';
+    router.push(redirectPath);
   } catch (error: any) {
-    ElMessage.error(error.message || '登录失败，请重试');
+    ElMessage.error(error.response?.data?.message || '登录失败，请重试');
   } finally {
     loading.value = false;
   }

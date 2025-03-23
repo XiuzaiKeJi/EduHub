@@ -83,14 +83,23 @@ check_health() {
     echo -n "检查 $service_type 服务健康状态"
     while [ $attempt -le $max_attempts ]; do
         if [ "$service_type" = "backend" ]; then
-            if curl -s "http://localhost:$port/health" > /dev/null 2>&1; then
+            local health_response
+            health_response=$(curl -s "http://localhost:$port/health" 2>&1)
+            if [ $? -eq 0 ]; then
                 echo -e "\n${GREEN}$service_type 服务已就绪${NC}"
+                echo -e "健康检查响应: $health_response"
                 return 0
+            else
+                echo -e "\n${YELLOW}健康检查失败: $health_response${NC}"
             fi
         elif [ "$service_type" = "frontend" ]; then
-            if curl -s -f "http://localhost:$port" > /dev/null 2>&1; then
+            local frontend_response
+            frontend_response=$(curl -s -f "http://localhost:$port" 2>&1)
+            if [ $? -eq 0 ]; then
                 echo -e "\n${GREEN}$service_type 服务已就绪${NC}"
                 return 0
+            else
+                echo -e "\n${YELLOW}前端服务检查失败: $frontend_response${NC}"
             fi
         fi
         echo -n "."
@@ -99,7 +108,7 @@ check_health() {
     done
     
     echo -e "\n${RED}$service_type 服务启动超时${NC}"
-    show_logs "$service_type" "${LOG_DIR}/${service_type}.log" 20
+    show_logs "$service_type" "${LOG_DIR}/${service_type}.log" 50
     return 1
 }
 
@@ -184,7 +193,7 @@ show_logs() {
 case "$1" in
     start)
         echo -e "${GREEN}启动所有服务...${NC}"
-        start_service "backend" 8080
+        start_service "backend" 3001
         start_service "frontend" 5173
         sleep 2
         show_logs "后端" "$BACKEND_LOG" 10

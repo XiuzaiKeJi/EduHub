@@ -59,7 +59,7 @@ export const useTaskStore = defineStore('task', {
         this.loading = true;
         this.error = '';
         
-        const response = await api.get<Task>(`/tasks/${id}`);
+        const response = await request.get<Task>(`/tasks/${id}`);
         const index = this.tasks.findIndex(t => t.id === id);
         if (index !== -1) {
           this.tasks[index] = response.data;
@@ -67,13 +67,14 @@ export const useTaskStore = defineStore('task', {
         return response.data;
       } catch (err: any) {
         this.error = err.response?.data?.message || '获取任务详情失败';
+        throw err;
       } finally {
         this.loading = false;
       }
     },
 
     // 创建任务
-    async createTask(task: Partial<Task>) {
+    async createTask(task: CreateTaskDto) {
       this.loading = true;
       this.error = null;
       try {
@@ -89,7 +90,7 @@ export const useTaskStore = defineStore('task', {
     },
 
     // 更新任务
-    async updateTask(id: number, task: Partial<Task>) {
+    async updateTask(id: number, task: UpdateTaskDto) {
       this.loading = true;
       this.error = null;
       try {

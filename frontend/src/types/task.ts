@@ -29,12 +29,16 @@ export interface CreateTaskDto {
   title: string;
   description?: string;
   status?: TaskStatus;
+  priority?: TaskPriority;
+  dueDate?: Date;
 }
 
 export interface UpdateTaskDto {
   title?: string;
   description?: string;
   status?: TaskStatus;
+  priority?: TaskPriority;
+  dueDate?: Date;
 }
 
 export interface TaskFilters {

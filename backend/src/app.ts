@@ -32,7 +32,14 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(morgan('dev'));
 app.use(cors({
-  origin: process.env.CORS_ORIGIN || 'http://localhost:5173',
+  origin: (origin, callback) => {
+    // 允许本地开发环境的请求
+    if (!origin || origin.match(/^http:\/\/localhost:(5173|5174|5175)$/)) {
+      callback(null, true);
+    } else {
+      callback(new Error('不允许的来源'));
+    }
+  },
   credentials: true,
 }));
 

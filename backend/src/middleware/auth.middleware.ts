@@ -16,7 +16,7 @@ export const authenticate = async (req: Request, res: Response, next: NextFuncti
         const userRepository = AppDataSource.getRepository(User);
         
         const user = await userRepository.findOne({
-            where: { id: decoded.userId },
+            where: { id: decoded.id },
             relations: ['roles', 'roles.permissions']
         });
 

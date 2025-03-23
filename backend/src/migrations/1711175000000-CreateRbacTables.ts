@@ -104,6 +104,17 @@ export class CreateRbacTables1711175000000 implements MigrationInterface {
                     {
                         name: 'permission_id',
                         type: 'int'
+                    },
+                    {
+                        name: 'created_at',
+                        type: 'timestamp',
+                        default: 'CURRENT_TIMESTAMP'
+                    },
+                    {
+                        name: 'updated_at',
+                        type: 'timestamp',
+                        default: 'CURRENT_TIMESTAMP',
+                        onUpdate: 'CURRENT_TIMESTAMP'
                     }
                 ]
             }),
@@ -122,6 +133,17 @@ export class CreateRbacTables1711175000000 implements MigrationInterface {
                     {
                         name: 'role_id',
                         type: 'int'
+                    },
+                    {
+                        name: 'created_at',
+                        type: 'timestamp',
+                        default: 'CURRENT_TIMESTAMP'
+                    },
+                    {
+                        name: 'updated_at',
+                        type: 'timestamp',
+                        default: 'CURRENT_TIMESTAMP',
+                        onUpdate: 'CURRENT_TIMESTAMP'
                     }
                 ]
             }),

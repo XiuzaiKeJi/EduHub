@@ -34,21 +34,26 @@ export class User {
   @Column({ nullable: true })
   lastLoginAt: Date;
 
-  @CreateDateColumn()
+  @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;
 
-  @UpdateDateColumn()
+  @UpdateDateColumn({ name: 'updated_at' })
   updatedAt: Date;
 
   @BeforeInsert()
   @BeforeUpdate()
   async hashPassword() {
-    if (this.password) {
+    if (this.password && !this.password.includes(':')) {
       this.password = await PasswordUtils.hash(this.password);
     }
   }
 
   async verifyPassword(password: string): Promise<boolean> {
-    return await PasswordUtils.verify(password, this.password);
+    try {
+      return await PasswordUtils.verify(password, this.password);
+    } catch (error) {
+      console.error('密码验证失败:', error);
+      return false;
+    }
   }
 } 

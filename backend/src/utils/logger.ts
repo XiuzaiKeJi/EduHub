@@ -1,14 +1,13 @@
 import winston from 'winston';
 import path from 'path';
 import fs from 'fs';
+import 'winston-daily-rotate-file';
 
 // 确保日志目录存在
 const logDir = path.join(__dirname, '../../logs');
 if (!fs.existsSync(logDir)) {
   fs.mkdirSync(logDir, { recursive: true });
 }
-
-const logFile = process.env.LOG_FILE || path.join(logDir, 'app.log');
 
 // 创建Winston日志记录器
 const logger = winston.createLogger({
@@ -18,18 +17,24 @@ const logger = winston.createLogger({
     winston.format.json()
   ),
   transports: [
-    // 文件日志
-    new winston.transports.File({
-      filename: logFile,
-      maxsize: 5242880, // 5MB
-      maxFiles: 5,
+    // 应用日志-按日期轮转
+    new winston.transports.DailyRotateFile({
+      filename: path.join(logDir, 'app-%DATE%.log'),
+      datePattern: 'YYYY-MM-DD',
+      maxSize: '10m',
+      maxFiles: '7d',
+      compress: true
     }),
-    // 错误日志
-    new winston.transports.File({
-      filename: path.join(logDir, 'error.log'),
+    // 错误日志-按日期轮转
+    new winston.transports.DailyRotateFile({
+      filename: path.join(logDir, 'error-%DATE%.log'),
+      datePattern: 'YYYY-MM-DD',
+      maxSize: '10m',
+      maxFiles: '7d',
       level: 'error',
-    }),
-  ],
+      compress: true
+    })
+  ]
 });
 
 // 非生产环境下同时输出到控制台
@@ -39,6 +44,7 @@ if (process.env.NODE_ENV !== 'production') {
       winston.format.colorize(),
       winston.format.simple()
     ),
+    level: process.env.NODE_ENV === 'development' ? 'debug' : 'info'
   }));
 }
 

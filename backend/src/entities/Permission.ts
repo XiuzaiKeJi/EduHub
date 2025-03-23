@@ -21,9 +21,9 @@ export class Permission {
     @ManyToMany(() => Role, role => role.permissions)
     roles: Role[];
 
-    @CreateDateColumn()
+    @CreateDateColumn({ name: 'created_at' })
     createdAt: Date;
 
-    @UpdateDateColumn()
+    @UpdateDateColumn({ name: 'updated_at' })
     updatedAt: Date;
 } 

@@ -3,6 +3,7 @@ import { User } from '../entities/User';
 import { Task } from '../entities/Task';
 import { Role } from '../entities/Role';
 import { Permission } from '../entities/Permission';
+import { CreateUserTable1711174900000 } from '../migrations/1711174900000-CreateUserTable';
 import { CreateRbacTables1711175000000 } from '../migrations/1711175000000-CreateRbacTables';
 import { InitialRbacData1711175100000 } from '../migrations/1711175100000-InitialRbacData';
 import logger from '../utils/logger';
@@ -27,9 +28,19 @@ export const AppDataSource = new DataSource({
   type: 'mysql',
   ...dbConfig,
   synchronize: false,
-  logging: process.env.NODE_ENV === 'development',
+  logging: ['error', 'warn', 'migration'],
+  maxQueryExecutionTime: 1000,
+  poolSize: 10,
+  extra: {
+    connectionLimit: 10,
+    queueLimit: 0,
+    waitForConnections: true
+  },
+  cache: {
+    duration: 60000 // 1分钟缓存
+  },
   entities: [User, Task, Role, Permission],
-  migrations: [CreateRbacTables1711175000000, InitialRbacData1711175100000],
+  migrations: [CreateUserTable1711174900000, CreateRbacTables1711175000000, InitialRbacData1711175100000],
   subscribers: [],
 });
 
