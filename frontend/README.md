@@ -1,41 +1,122 @@
-# EduHub 前端项目
+# EduHub Frontend
+
+## 项目简介
+
+EduHub前端项目采用Vue 3 + TypeScript开发，提供简洁直观的任务看板界面。
 
 ## 技术栈
 
-- Vue 3 - 渐进式 JavaScript 框架
-- TypeScript - 类型安全的 JavaScript 超集
-- Vite - 现代前端构建工具
-- Pinia - Vue 3 的状态管理库
-- Vue Router - 路由管理
-- Element Plus - UI 组件库
-- Vue Draggable - 拖拽功能支持
-- ECharts - 数据可视化
+- Vue 3
+- TypeScript
+- Vite
+- Element Plus
+- Pinia
+- Vue Router
 
 ## 项目结构
 
 ```
 src/
-├── api/           # API 接口定义
-├── assets/        # 静态资源
-├── components/    # 通用组件
-│   ├── board/    # 看板相关组件
-│   ├── task/     # 任务相关组件
-│   └── common/   # 其他通用组件
-├── composables/   # 组合式函数
-├── layouts/       # 布局组件
-├── router/        # 路由配置
-├── stores/        # 状态管理
-│   ├── task/     # 任务状态
-│   ├── user/     # 用户状态
-│   └── board/    # 看板状态
-├── styles/        # 全局样式
-├── types/         # TypeScript 类型
-├── utils/         # 工具函数
-└── views/         # 页面组件
-    ├── board/    # 看板视图
-    ├── task/     # 任务管理
-    ├── user/     # 用户管理
-    └── stats/    # 统计分析
+├── assets/          # 静态资源
+├── components/      # 公共组件
+│   ├── board/      # 看板相关组件
+│   └── common/     # 通用组件
+├── composables/    # 组合式函数
+├── layouts/        # 布局组件
+├── pages/          # 页面组件
+├── router/         # 路由配置
+├── stores/         # 状态管理
+├── styles/         # 全局样式
+├── types/          # 类型定义
+└── utils/          # 工具函数
+```
+
+## 开发指南
+
+1. 安装依赖
+```bash
+pnpm install
+```
+
+2. 启动开发服务器
+```bash
+pnpm dev
+```
+
+3. 构建生产版本
+```bash
+pnpm build
+```
+
+## 核心组件
+
+### TaskBoard
+任务看板主组件，支持:
+- 拖拽排序
+- 状态切换
+- 任务筛选
+- 进度统计
+
+### TaskCard
+任务卡片组件，展示:
+- 任务标题
+- 优先级
+- 截止日期
+- 任务状态
+
+### TaskForm
+任务表单组件，用于:
+- 创建任务
+- 编辑任务
+- 表单验证
+
+## 开发规范
+
+### 组件规范
+- 使用 Composition API
+- 使用 TypeScript 类型注解
+- 遵循单一职责原则
+- 保持组件轻量化
+
+### 样式规范
+- 使用 SCSS
+- 遵循 BEM 命名
+- 优先使用 Element Plus 样式变量
+- 避免深层嵌套
+
+### 状态管理
+- 使用 Pinia 管理状态
+- 按功能模块拆分 store
+- 保持 store 结构扁平
+- 使用 TypeScript 定义 store 类型
+
+## 构建优化
+
+- 路由懒加载
+- 组件按需导入
+- 资源压缩
+- 缓存策略
+
+## 开发命令
+
+```bash
+# 开发环境
+pnpm dev
+
+# 类型检查
+pnpm type-check
+
+# 代码格式化
+pnpm format
+
+# 代码检查
+pnpm lint
+
+# 单元测试
+pnpm test:unit
+
+# 构建
+pnpm build
 ```
 
 ## 开发指南

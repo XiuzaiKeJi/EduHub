@@ -65,4 +65,15 @@ public/uploads/
 # 临时目录
 temp/
 tmp/
-*.pid 
+*.pid
+
+# 开发工具优化
+dist-ssr
+*.local
+
+# 环境文件
+.env.*
+!.env.example
+
+# TypeScript
+*.tsbuildinfo 

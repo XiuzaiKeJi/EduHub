@@ -1,77 +1,156 @@
 import { defineStore } from 'pinia';
 import { ref } from 'vue';
-import type { Task, CreateTaskDto, UpdateTaskDto } from '@/types/task';
+import type { Task, CreateTaskDto, UpdateTaskDto, TaskFilters, TaskListResponse } from '@/types/task';
 import { api } from '@/utils/api';
+import { request } from '@/utils/request';
 
-export const useTaskStore = defineStore('task', () => {
-  const tasks = ref<Task[]>([]);
-  const currentTask = ref<Task | null>(null);
-  const loading = ref(false);
-  const error = ref('');
+export const useTaskStore = defineStore('task', {
+  state: () => ({
+    tasks: [] as Task[],
+    total: 0,
+    loading: false,
+    error: null as string | null
+  }),
 
-  // 获取任务列表
-  const getTasks = async () => {
-    const response = await api.get<Task[]>('/tasks');
-    tasks.value = response.data;
-    return response.data;
-  };
+  getters: {
+    // 获取未完成的任务数量
+    uncompletedCount: (state) => 
+      state.tasks.filter(task => task.status !== 'completed').length,
+    
+    // 获取已归档的任务数量
+    archivedCount: (state) =>
+      state.tasks.filter(task => task.isArchived).length,
+    
+    // 按优先级分组的任务
+    tasksByPriority: (state) => {
+      const groups = {
+        high: [] as Task[],
+        medium: [] as Task[],
+        low: [] as Task[]
+      }
+      state.tasks.forEach(task => {
+        groups[task.priority].push(task)
+      })
+      return groups
+    }
+  },
 
-  // 获取单个任务详情
-  async function fetchTaskById(id: number) {
-    try {
-      loading.value = true;
-      error.value = '';
-      
-      const response = await api.get<Task>(`/tasks/${id}`);
-      currentTask.value = response.data;
-    } catch (err: any) {
-      error.value = err.response?.data?.message || '获取任务详情失败';
-    } finally {
-      loading.value = false;
+  actions: {
+    // 获取任务列表
+    async getTasks(filters: TaskFilters) {
+      this.loading = true;
+      this.error = null;
+      try {
+        const response = await request.get<TaskListResponse>('/tasks', { params: filters });
+        this.tasks = response.data.tasks;
+        this.total = response.data.pagination.total;
+        return response.data;
+      } catch (error: any) {
+        this.error = error.message;
+        throw error;
+      } finally {
+        this.loading = false;
+      }
+    },
+
+    // 获取单个任务详情
+    async fetchTaskById(id: number) {
+      try {
+        this.loading = true;
+        this.error = '';
+        
+        const response = await request.get<Task>(`/tasks/${id}`);
+        const index = this.tasks.findIndex(t => t.id === id);
+        if (index !== -1) {
+          this.tasks[index] = response.data;
+        }
+        return response.data;
+      } catch (err: any) {
+        this.error = err.response?.data?.message || '获取任务详情失败';
+        throw err;
+      } finally {
+        this.loading = false;
+      }
+    },
+
+    // 创建任务
+    async createTask(task: CreateTaskDto) {
+      this.loading = true;
+      this.error = null;
+      try {
+        const response = await request.post<Task>('/tasks', task);
+        this.tasks.unshift(response.data);
+        return response.data;
+      } catch (error: any) {
+        this.error = error.message;
+        throw error;
+      } finally {
+        this.loading = false;
+      }
+    },
+
+    // 更新任务
+    async updateTask(id: number, task: UpdateTaskDto) {
+      this.loading = true;
+      this.error = null;
+      try {
+        const response = await request.put<Task>(`/tasks/${id}`, task);
+        const index = this.tasks.findIndex(t => t.id === id);
+        if (index !== -1) {
+          this.tasks[index] = response.data;
+        }
+        return response.data;
+      } catch (error: any) {
+        this.error = error.message;
+        throw error;
+      } finally {
+        this.loading = false;
+      }
+    },
+
+    // 删除任务
+    async deleteTask(id: number) {
+      this.loading = true;
+      this.error = null;
+      try {
+        await request.delete(`/tasks/${id}`);
+        const index = this.tasks.findIndex(t => t.id === id);
+        if (index !== -1) {
+          this.tasks.splice(index, 1);
+        }
+      } catch (error: any) {
+        this.error = error.message;
+        throw error;
+      } finally {
+        this.loading = false;
+      }
+    },
+
+    // 批量更新任务状态
+    async batchUpdateStatus(taskIds: number[], status: string) {
+      this.loading = true;
+      this.error = null;
+      try {
+        const response = await request.post('/tasks/batch/status', { taskIds, status });
+        // 更新本地状态
+        response.data.forEach((updatedTask: Task) => {
+          const index = this.tasks.findIndex(t => t.id === updatedTask.id);
+          if (index !== -1) {
+            this.tasks[index] = updatedTask;
+          }
+        });
+        return response.data;
+      } catch (error: any) {
+        this.error = error.message;
+        throw error;
+      } finally {
+        this.loading = false;
+      }
+    },
+
+    // 清除错误
+    clearError() {
+      this.error = null;
     }
   }
-
-  // 创建任务
-  const createTask = async (task: CreateTaskDto) => {
-    const response = await api.post<Task>('/tasks', task);
-    tasks.value.unshift(response.data);
-    return response.data;
-  };
-
-  // 更新任务
-  const updateTask = async (id: number, task: UpdateTaskDto) => {
-    const response = await api.put<Task>(`/tasks/${id}`, task);
-    const index = tasks.value.findIndex(t => t.id === id);
-    if (index !== -1) {
-      tasks.value[index] = response.data;
-    }
-    if (currentTask.value?.id === id) {
-      currentTask.value = response.data;
-    }
-    return response.data;
-  };
-
-  // 删除任务
-  const deleteTask = async (id: number) => {
-    await api.delete(`/tasks/${id}`);
-    const index = tasks.value.findIndex(t => t.id === id);
-    if (index !== -1) {
-      tasks.value.splice(index, 1);
-    }
-    if (currentTask.value?.id === id) {
-      currentTask.value = null;
-    }
-  };
-
-  return {
-    tasks,
-    currentTask,
-    loading,
-    error,
-    getTasks,
-    fetchTaskById,
-    createTask,
-    updateTask,
-    deleteTask
-  };
 }); 

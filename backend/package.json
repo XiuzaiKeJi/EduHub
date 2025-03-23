@@ -7,7 +7,12 @@
     "dev": "ts-node-dev --respawn --transpile-only src/app.ts",
     "build": "tsc",
     "start": "node dist/app.js",
-    "typeorm": "typeorm-ts-node-commonjs"
+    "typeorm": "typeorm-ts-node-commonjs -d src/config/database.ts",
+    "migration:run": "npm run typeorm migration:run",
+    "migration:revert": "npm run typeorm migration:revert",
+    "migration:show": "npm run typeorm migration:show",
+    "migration:generate": "npm run typeorm migration:generate",
+    "migration:create": "npm run typeorm migration:create"
   },
   "keywords": [],
   "author": "",
@@ -23,6 +28,7 @@
     "typescript": "^5.0.2"
   },
   "dependencies": {
+    "better-sqlite3": "^11.9.1",
     "cors": "^2.8.5",
     "dotenv": "^16.0.3",
     "express": "^4.18.2",
@@ -30,8 +36,10 @@
     "morgan": "^1.10.0",
     "mysql2": "^3.2.0",
     "reflect-metadata": "^0.1.13",
+    "sqlite3": "^5.1.7",
     "typeorm": "^0.3.12",
-    "winston": "^3.8.2"
+    "winston": "^3.8.2",
+    "winston-daily-rotate-file": "^5.0.0"
   },
   "directories": {
     "test": "tests"

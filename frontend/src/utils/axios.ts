@@ -3,7 +3,7 @@ import router from '@/router';
 
 // 创建axios实例
 const instance = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000',
+  baseURL: import.meta.env.VITE_API_BASE_URL || '',
   timeout: 10000,
   headers: {
     'Content-Type': 'application/json'
@@ -27,7 +27,7 @@ instance.interceptors.request.use(
 // 响应拦截器
 instance.interceptors.response.use(
   (response) => {
-    return response;
+    return response.data;
   },
   (error) => {
     if (error.response) {

@@ -1,76 +1,146 @@
-# EduHub 后端项目
+# EduHub Backend
+
+## 项目简介
+
+EduHub后端项目采用Node.js + TypeScript开发，提供任务看板系统的核心API服务。
 
 ## 技术栈
 
-- Node.js - JavaScript 运行时
-- Express - Web 应用框架
-- TypeScript - 类型安全的 JavaScript 超集
-- SQLite - 轻量级关系型数据库
-- JWT - 用户认证
-- Winston - 日志管理
-- Socket.IO - 实时通信
+- Node.js
+- TypeScript
+- Express.js
+- TypeORM
+- MySQL
 
 ## 项目结构
 
 ```
 src/
 ├── config/         # 配置文件
-│   ├── board/     # 看板控制器
-│   ├── task/      # 任务控制器
-│   └── user/      # 用户控制器
+├── controllers/    # 控制器
+├── entities/       # 数据实体
 ├── middlewares/    # 中间件
-│   ├── auth/      # 认证中间件
-│   ├── role/      # 角色中间件
-│   └── validate/  # 验证中间件
-├── models/         # 数据模型
-│   ├── Board.ts   # 看板模型
-│   ├── Task.ts    # 任务模型
-│   └── User.ts    # 用户模型
-├── routes/         # 路由定义
-├── services/       # 业务逻辑
-│   ├── board/     # 看板服务
-│   ├── task/      # 任务服务
-│   └── user/      # 用户服务
-├── types/          # TypeScript 类型
-├── utils/          # 工具函数
-└── app.ts          # 应用入口
+├── migrations/     # 数据迁移
+├── services/       # 业务服务
+├── types/          # 类型定义
+└── utils/          # 工具函数
 ```
 
 ## 开发指南
 
-### 环境要求
-- Node.js 18.x 或更高版本
-- pnpm 10.x 或更高版本
-- SQLite 3.x
-
-### 安装依赖
+1. 安装依赖
 ```bash
 pnpm install
 ```
 
-### 开发服务器
+2. 配置环境变量
+```bash
+cp .env.example .env.development
+```
+
+3. 启动开发服务器
 ```bash
 pnpm dev
 ```
 
-### 构建生产版本
+4. 构建生产版本
 ```bash
 pnpm build
 ```
 
-### 代码检查
+## 核心模块
+
+### Task模块
+任务管理的核心模块:
+- 任务CRUD操作
+- 任务状态管理
+- 任务优先级设置
+- 任务过滤和排序
+
+### Board模块
+看板管理模块:
+- 看板列配置
+- 任务排序
+- 状态统计
+- 数据导出
+
+## 数据模型
+
+### Task
+```typescript
+interface Task {
+  id: number;
+  title: string;
+  description: string;
+  status: TaskStatus;
+  priority: TaskPriority;
+  dueDate: Date;
+  createdAt: Date;
+  updatedAt: Date;
+}
+```
+
+### Board
+```typescript
+interface Board {
+  id: number;
+  name: string;
+  columns: BoardColumn[];
+  createdAt: Date;
+  updatedAt: Date;
+}
+```
+
+## 开发规范
+
+### 代码规范
+- 使用 TypeScript 类型注解
+- 遵循 RESTful API 设计
+- 使用 async/await 处理异步
+- 统一错误处理
+
+### 数据库规范
+- 使用 TypeORM 装饰器
+- 定义清晰的实体关系
+- 合理使用索引
+- 规范命名约定
+
+### API规范
+- 版本控制
+- 请求参数验证
+- 统一响应格式
+- 合理的状态码
+
+## 性能优化
+
+- 数据库查询优化
+- 请求缓存
+- 错误日志
+- 安全防护
+
+## 开发命令
+
 ```bash
+# 开发环境
+pnpm dev
+
+# 类型检查
+pnpm type-check
+
+# 数据库迁移
+pnpm migration:run
+
+# 生成迁移文件
+pnpm migration:generate
+
+# 代码检查
 pnpm lint
-```
 
-### 代码格式化
-```bash
-pnpm format
-```
-
-### 运行测试
-```bash
+# 单元测试
 pnpm test
+
+# 构建
+pnpm build
 ```
 
 ## API 文档

@@ -4,12 +4,6 @@ import { AuthRequest } from '../middleware/auth.middleware';
 import logger from '../utils/logger';
 
 export class AuthController {
-  private authService: AuthService;
-
-  constructor() {
-    this.authService = new AuthService();
-  }
-
   // 用户注册
   async register(req: Request, res: Response): Promise<void> {
     try {
@@ -34,7 +28,7 @@ export class AuthController {
         return;
       }
 
-      const user = await this.authService.register(username, email, password);
+      const user = await AuthService.register(username, email, password);
       res.status(201).json({ message: '注册成功', user });
     } catch (error: any) {
       logger.error('注册失败:', error);
@@ -53,7 +47,7 @@ export class AuthController {
         return;
       }
 
-      const result = await this.authService.login(email, password);
+      const result = await AuthService.login(email, password);
       res.json({ message: '登录成功', ...result });
     } catch (error: any) {
       logger.error('登录失败:', error);
@@ -64,17 +58,34 @@ export class AuthController {
   // 获取当前用户信息
   async getCurrentUser(req: AuthRequest, res: Response): Promise<void> {
     try {
-      const userId = req.userId;
-      if (!userId) {
+      if (!req.user) {
         res.status(401).json({ message: '未授权' });
         return;
       }
 
-      const user = await this.authService.getCurrentUser(userId);
-      res.json({ user });
+      res.json(req.user);
     } catch (error: any) {
       logger.error('获取用户信息失败:', error);
       res.status(400).json({ message: error.message || '获取用户信息失败' });
+    }
+  }
+
+  // 分配角色
+  async assignRole(req: AuthRequest, res: Response): Promise<void> {
+    try {
+      const { userId, roleIds } = req.body;
+
+      // 验证请求数据
+      if (!userId || !roleIds || !Array.isArray(roleIds)) {
+        res.status(400).json({ message: '请提供用户ID和角色ID列表' });
+        return;
+      }
+
+      const user = await AuthService.assignRole(userId, roleIds);
+      res.json({ message: '角色分配成功', user });
+    } catch (error: any) {
+      logger.error('角色分配失败:', error);
+      res.status(400).json({ message: error.message || '角色分配失败' });
     }
   }
 } 

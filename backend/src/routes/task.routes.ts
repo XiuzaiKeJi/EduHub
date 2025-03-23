@@ -1,23 +1,29 @@
 import { Router } from 'express';
-import { authenticateToken } from '../middleware/auth.middleware';
+import { authenticate, checkPermission } from '../middleware/auth.middleware';
 import { TaskController } from '../controllers/task.controller';
 
 const router = Router();
 const taskController = new TaskController();
 
+// 所有任务路由都需要认证
+router.use(authenticate);
+
 // 获取任务列表
-router.get('/', authenticateToken, taskController.getTasks.bind(taskController));
+router.get('/', checkPermission('task', 'read'), taskController.getTasks.bind(taskController));
 
 // 创建任务
-router.post('/', authenticateToken, taskController.createTask.bind(taskController));
+router.post('/', checkPermission('task', 'create'), taskController.createTask.bind(taskController));
 
 // 获取单个任务
-router.get('/:id', authenticateToken, taskController.getTaskById.bind(taskController));
+router.get('/:id', checkPermission('task', 'read'), taskController.getTaskById.bind(taskController));
 
 // 更新任务
-router.put('/:id', authenticateToken, taskController.updateTask.bind(taskController));
+router.put('/:id', checkPermission('task', 'update'), taskController.updateTask.bind(taskController));
 
 // 删除任务
-router.delete('/:id', authenticateToken, taskController.deleteTask.bind(taskController));
+router.delete('/:id', checkPermission('task', 'delete'), taskController.deleteTask.bind(taskController));
+
+// 批量更新任务状态
+router.post('/batch/status', checkPermission('task', 'update'), taskController.batchUpdateStatus.bind(taskController));
 
 export default router; 

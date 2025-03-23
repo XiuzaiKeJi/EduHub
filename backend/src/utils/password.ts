@@ -1,4 +1,5 @@
 import crypto from 'crypto';
+import logger from './logger';
 
 export class PasswordUtils {
   private static readonly SALT_LENGTH = 16;
@@ -7,15 +8,30 @@ export class PasswordUtils {
   private static readonly DIGEST = 'sha512';
 
   static async hash(password: string): Promise<string> {
-    const salt = crypto.randomBytes(this.SALT_LENGTH).toString('hex');
-    const hash = await this.hashWithSalt(password, salt);
-    return `${salt}:${hash}`;
+    try {
+      const salt = crypto.randomBytes(this.SALT_LENGTH).toString('hex');
+      const hash = await this.hashWithSalt(password, salt);
+      return `${salt}:${hash}`;
+    } catch (error) {
+      logger.error('密码哈希失败:', error);
+      throw error;
+    }
   }
 
   static async verify(password: string, hashedPassword: string): Promise<boolean> {
-    const [salt, hash] = hashedPassword.split(':');
-    const newHash = await this.hashWithSalt(password, salt);
-    return hash === newHash;
+    try {
+      if (!hashedPassword || !hashedPassword.includes(':')) {
+        logger.error('无效的哈希密码格式');
+        return false;
+      }
+
+      const [salt, hash] = hashedPassword.split(':');
+      const newHash = await this.hashWithSalt(password, salt);
+      return hash === newHash;
+    } catch (error) {
+      logger.error('密码验证失败:', error);
+      return false;
+    }
   }
 
   private static hashWithSalt(password: string, salt: string): Promise<string> {
@@ -27,8 +43,12 @@ export class PasswordUtils {
         this.KEY_LENGTH,
         this.DIGEST,
         (err, derivedKey) => {
-          if (err) reject(err);
-          resolve(derivedKey.toString('hex'));
+          if (err) {
+            logger.error('密码哈希计算失败:', err);
+            reject(err);
+          } else {
+            resolve(derivedKey.toString('hex'));
+          }
         }
       );
     });
