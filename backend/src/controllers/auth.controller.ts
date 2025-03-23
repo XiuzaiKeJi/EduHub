@@ -4,12 +4,6 @@ import { AuthRequest } from '../middleware/auth.middleware';
 import logger from '../utils/logger';
 
 export class AuthController {
-  private authService: AuthService;
-
-  constructor() {
-    this.authService = new AuthService();
-  }
-
   // 用户注册
   async register(req: Request, res: Response): Promise<void> {
     try {
@@ -34,7 +28,7 @@ export class AuthController {
         return;
       }
 
-      const user = await this.authService.register(username, email, password);
+      const user = await AuthService.register(username, email, password);
       res.status(201).json({ message: '注册成功', user });
     } catch (error: any) {
       logger.error('注册失败:', error);
@@ -53,7 +47,7 @@ export class AuthController {
         return;
       }
 
-      const result = await this.authService.login(email, password);
+      const result = await AuthService.login(email, password);
       res.json({ message: '登录成功', ...result });
     } catch (error: any) {
       logger.error('登录失败:', error);
@@ -70,7 +64,7 @@ export class AuthController {
         return;
       }
 
-      const user = await this.authService.getCurrentUser(userId);
+      const user = await AuthService.getCurrentUser(userId);
       res.json({ user });
     } catch (error: any) {
       logger.error('获取用户信息失败:', error);
