@@ -1,17 +1,7 @@
 import { defineStore } from 'pinia';
 import { ref } from 'vue';
-import axios from 'axios';
-
-interface Task {
-  id: number;
-  title: string;
-  description: string;
-  status: string;
-  assignee?: string;
-  dueDate?: string;
-  createdAt: string;
-  updatedAt: string;
-}
+import type { Task, CreateTaskDto, UpdateTaskDto } from '@/types/task';
+import { api } from '@/utils/api';
 
 export const useTaskStore = defineStore('task', () => {
   const tasks = ref<Task[]>([]);
@@ -20,19 +10,11 @@ export const useTaskStore = defineStore('task', () => {
   const error = ref('');
 
   // 获取任务列表
-  async function fetchTasks() {
-    try {
-      loading.value = true;
-      error.value = '';
-      
-      const response = await axios.get('/api/tasks');
-      tasks.value = response.data.tasks;
-    } catch (err: any) {
-      error.value = err.response?.data?.message || '获取任务列表失败';
-    } finally {
-      loading.value = false;
-    }
-  }
+  const getTasks = async () => {
+    const response = await api.get<Task[]>('/tasks');
+    tasks.value = response.data;
+    return response.data;
+  };
 
   // 获取单个任务详情
   async function fetchTaskById(id: number) {
@@ -40,8 +22,8 @@ export const useTaskStore = defineStore('task', () => {
       loading.value = true;
       error.value = '';
       
-      const response = await axios.get(`/api/tasks/${id}`);
-      currentTask.value = response.data.task;
+      const response = await api.get<Task>(`/tasks/${id}`);
+      currentTask.value = response.data;
     } catch (err: any) {
       error.value = err.response?.data?.message || '获取任务详情失败';
     } finally {
@@ -50,71 +32,43 @@ export const useTaskStore = defineStore('task', () => {
   }
 
   // 创建任务
-  async function createTask(taskData: Omit<Task, 'id' | 'createdAt' | 'updatedAt'>) {
-    try {
-      loading.value = true;
-      error.value = '';
-      
-      const response = await axios.post('/api/tasks', taskData);
-      tasks.value.push(response.data.task);
-      return true;
-    } catch (err: any) {
-      error.value = err.response?.data?.message || '创建任务失败';
-      return false;
-    } finally {
-      loading.value = false;
-    }
-  }
+  const createTask = async (task: CreateTaskDto) => {
+    const response = await api.post<Task>('/tasks', task);
+    tasks.value.unshift(response.data);
+    return response.data;
+  };
 
   // 更新任务
-  async function updateTask(id: number, taskData: Partial<Task>) {
-    try {
-      loading.value = true;
-      error.value = '';
-      
-      const response = await axios.put(`/api/tasks/${id}`, taskData);
-      const index = tasks.value.findIndex(task => task.id === id);
-      if (index !== -1) {
-        tasks.value[index] = response.data.task;
-      }
-      if (currentTask.value?.id === id) {
-        currentTask.value = response.data.task;
-      }
-      return true;
-    } catch (err: any) {
-      error.value = err.response?.data?.message || '更新任务失败';
-      return false;
-    } finally {
-      loading.value = false;
+  const updateTask = async (id: number, task: UpdateTaskDto) => {
+    const response = await api.put<Task>(`/tasks/${id}`, task);
+    const index = tasks.value.findIndex(t => t.id === id);
+    if (index !== -1) {
+      tasks.value[index] = response.data;
     }
-  }
+    if (currentTask.value?.id === id) {
+      currentTask.value = response.data;
+    }
+    return response.data;
+  };
 
   // 删除任务
-  async function deleteTask(id: number) {
-    try {
-      loading.value = true;
-      error.value = '';
-      
-      await axios.delete(`/api/tasks/${id}`);
-      tasks.value = tasks.value.filter(task => task.id !== id);
-      if (currentTask.value?.id === id) {
-        currentTask.value = null;
-      }
-      return true;
-    } catch (err: any) {
-      error.value = err.response?.data?.message || '删除任务失败';
-      return false;
-    } finally {
-      loading.value = false;
+  const deleteTask = async (id: number) => {
+    await api.delete(`/tasks/${id}`);
+    const index = tasks.value.findIndex(t => t.id === id);
+    if (index !== -1) {
+      tasks.value.splice(index, 1);
     }
-  }
+    if (currentTask.value?.id === id) {
+      currentTask.value = null;
+    }
+  };
 
   return {
     tasks,
     currentTask,
     loading,
     error,
-    fetchTasks,
+    getTasks,
     fetchTaskById,
     createTask,
     updateTask,

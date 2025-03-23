@@ -2,6 +2,7 @@
 node_modules/
 .pnp/
 .pnp.js
+.pnpm-store/
 
 # Build outputs
 dist/
@@ -28,6 +29,7 @@ logs/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+pnpm-debug.log*
 
 # Testing
 coverage/
@@ -62,4 +64,5 @@ public/uploads/
 
 # 临时目录
 temp/
-tmp/ 
+tmp/
+*.pid 

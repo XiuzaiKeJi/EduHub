@@ -1,0 +1,14 @@
+{
+  "name": "eduhub",
+  "version": "1.0.0",
+  "description": "EduHub教育资源管理平台",
+  "scripts": {
+    "start": "./scripts/manage.sh start",
+    "stop": "./scripts/manage.sh stop",
+    "restart": "./scripts/manage.sh restart",
+    "status": "./scripts/manage.sh status",
+    "logs": "./scripts/manage.sh logs",
+    "clean": "rm -rf tmp/* logs/*",
+    "postinstall": "cd frontend && pnpm install && cd ../backend && pnpm install"
+  }
+} 

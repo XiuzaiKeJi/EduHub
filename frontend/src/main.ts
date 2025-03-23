@@ -9,6 +9,7 @@ import App from './App.vue'
 import router from './router'
 import axios from './utils/axios'
 import type { App as AppType } from 'vue'
+import components from './components'
 
 const app: AppType = createApp(App)
 
@@ -25,5 +26,6 @@ app.use(createPinia())
    .use(ElementPlus, {
      locale: zhCn,
    })
+   .use(components)
 
 app.mount('#app')

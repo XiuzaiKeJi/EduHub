@@ -12,11 +12,11 @@
 
     /* Language and Environment */
     "target": "ES2020",
-    "lib": ["ES2020"],
+    "lib": ["es2020"],
     // "jsx": "preserve",                                /* Specify what JSX code is generated. */
     // "libReplacement": true,                           /* Enable lib replacement. */
-    // "experimentalDecorators": true,                   /* Enable experimental support for legacy experimental decorators. */
-    // "emitDecoratorMetadata": true,                    /* Emit design-type metadata for decorated declarations in source files. */
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
     // "jsxFactory": "",                                 /* Specify the JSX factory function used when targeting React JSX emit, e.g. 'React.createElement' or 'h'. */
     // "jsxFragmentFactory": "",                         /* Specify the JSX Fragment reference used for fragments when targeting React JSX emit e.g. 'React.Fragment' or 'Fragment'. */
     // "jsxImportSource": "",                            /* Specify module specifier used to import the JSX factory functions when using 'jsx: react-jsx*'. */
@@ -54,10 +54,8 @@
     // "maxNodeModuleJsDepth": 1,                        /* Specify the maximum folder depth used for checking JavaScript files from 'node_modules'. Only applicable with 'allowJs'. */
 
     /* Emit */
-    // "declaration": true,                              /* Generate .d.ts files from TypeScript and JavaScript files in your project. */
-    // "declarationMap": true,                           /* Create sourcemaps for d.ts files. */
-    // "emitDeclarationOnly": true,                      /* Only output d.ts files and not JavaScript files. */
-    // "sourceMap": true,                                /* Create source map files for emitted JavaScript files. */
+    "declaration": true,
+    "sourceMap": true,
     // "inlineSourceMap": true,                          /* Include sourcemap files inside the emitted JavaScript. */
     // "noEmit": true,                                   /* Disable emitting files from a compilation. */
     // "outFile": "./",                                  /* Specify a file that bundles all outputs into one JavaScript file. If 'declaration' is true, also designates a file that bundles all .d.ts output. */
@@ -92,7 +90,7 @@
     // "strictNullChecks": true,                         /* When type checking, take into account 'null' and 'undefined'. */
     // "strictFunctionTypes": true,                      /* When assigning functions, check to ensure parameters and the return values are subtype-compatible. */
     // "strictBindCallApply": true,                      /* Check that the arguments for 'bind', 'call', and 'apply' methods match the original function. */
-    // "strictPropertyInitialization": true,             /* Check for class properties that are declared but not set in the constructor. */
+    "strictPropertyInitialization": false,
     // "strictBuiltinIteratorReturn": true,              /* Built-in iterators are instantiated with a 'TReturn' type of 'undefined' instead of 'any'. */
     // "noImplicitThis": true,                           /* Enable error reporting when 'this' is given the type 'any'. */
     // "useUnknownInCatchVariables": true,               /* Default catch clause variables as 'unknown' instead of 'any'. */

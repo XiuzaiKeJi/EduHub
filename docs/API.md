@@ -4,9 +4,9 @@
 本文档详细说明了 EduHub 项目的 API 接口规范。
 
 ## 基础信息
-- 基础URL: `http://localhost:3000/api/v1`
-- 所有请求和响应均使用 JSON 格式
-- 认证方式：JWT Token
+- 基础URL: `http://localhost:8080/api`
+- 所有请求都需要在header中携带token: `Authorization: Bearer <token>`
+- 响应格式统一为JSON
 
 ## API 端点
 
@@ -17,7 +17,7 @@
 - 请求体：
   ```json
   {
-    "username": "string",
+    "email": "string",
     "password": "string"
   }
   ```
@@ -27,7 +27,8 @@
     "token": "string",
     "user": {
       "id": "number",
-      "username": "string",
+      "email": "string",
+      "name": "string",
       "role": "string"
     }
   }
@@ -62,7 +63,8 @@
 {
   "error": {
     "code": "string",
-    "message": "string"
+    "message": "string",
+    "details": "object"
   }
 }
 ```

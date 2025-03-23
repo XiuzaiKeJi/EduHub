@@ -2,10 +2,13 @@ import { Request, Response, NextFunction } from 'express';
 import { AuthService } from '../services/auth.service';
 
 export interface AuthRequest extends Request {
-  userId?: number;
+  user?: {
+    id: number;
+    email: string;
+  };
 }
 
-export const authMiddleware = async (
+export const authenticateToken = async (
   req: AuthRequest,
   res: Response,
   next: NextFunction
@@ -22,8 +25,8 @@ export const authMiddleware = async (
     }
 
     const authService = new AuthService();
-    const { userId } = authService.verifyToken(token);
-    req.userId = userId;
+    const decoded = authService.verifyToken(token);
+    req.user = decoded;
 
     next();
   } catch (error) {
