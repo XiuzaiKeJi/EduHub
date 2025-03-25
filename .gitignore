@@ -1,1 +1,79 @@
- 
+# Dependencies
+node_modules/
+.pnp/
+.pnp.js
+.pnpm-store/
+
+# Build outputs
+dist/
+build/
+out/
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# IDE
+.idea/
+.vscode/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Testing
+coverage/
+
+# System files
+.DS_Store
+Thumbs.db
+
+# SQLite database files
+*.sqlite
+*.sqlite3
+*.db
+
+# Cache
+.cache/
+.temp/
+.eslintcache
+
+# 证书和密钥
+*.pem
+*.key
+*.crt
+
+# 临时文件
+*.tmp
+*.temp
+.cache/
+
+# 上传文件
+uploads/
+public/uploads/
+
+# 临时目录
+temp/
+tmp/
+*.pid
+
+# 开发工具优化
+dist-ssr
+*.local
+
+# 环境文件
+.env.*
+!.env.example
+
+# TypeScript
+*.tsbuildinfo 
