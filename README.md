@@ -1,17 +1,158 @@
-# EduHub 项目
+# EduHub 行政办公任务跟踪管理中心
 
 ## 项目简介
 
-EduHub 是一个基于任务跟踪的智慧教育管理中心，旨在提供完整的教育管理功
-能。
+EduHub 是一个基于Cursor agent自动开发的行政办公任务跟踪管理中心，旨在提供完整的任务管理功能。本项目采用AI驱动的开发方式，通过Cursor agent实现需求分析、产品设计、开发实现的全流程自动化。
 
 ## 技术栈
 
-- 后端框架: NestJS
-- 数据库: PostgreSQL
-- ORM: TypeORM
-- 认证: JWT
-- 测试框架: Jest
+- 后端框架：NestJS
+- 数据库：SQLite
+- 前端框架：React
+- 开发语言：TypeScript
+- 包管理器：pnpm
+- 代码规范：ESLint + Prettier
+- 版本控制：Git Flow
+- 自动化工具：Husky + lint-staged
+
+## 功能特性
+
+- 任务管理
+
+  - 任务创建与分配
+  - 任务状态跟踪
+  - 任务优先级管理
+  - 任务依赖关系
+  - 任务截止时间管理
+
+- 团队协作
+
+  - 团队成员管理
+  - 任务分配与转交
+  - 团队进度追踪
+  - 协作通知
+
+- 报表统计
+
+  - 任务完成率统计
+  - 团队工作量分析
+  - 项目进度报表
+  - 绩效评估
+
+- 系统管理
+  - 用户权限管理
+  - 系统配置管理
+  - 日志审计
+  - 数据备份
+
+## 开发流程
+
+1. 需求分析
+
+   - AI需求收集
+   - 需求分类与优先级
+   - 可行性评估
+
+2. 产品设计
+
+   - 功能规划
+   - 原型设计
+   - 文档生成
+
+3. 开发实现
+
+   - 技术方案
+   - 代码实现
+   - 测试验证
+
+4. 发布部署
+   - 代码审查
+   - 测试验证
+   - 部署上线
+
+## 项目结构
+
+```
+EduHub/
+├── src/                # 源代码
+├── docs/              # 文档
+│   ├── prd/          # 产品需求文档
+│   ├── research/     # 研究文档
+│   ├── test-reports/ # 测试报告
+│   └── meeting-notes/# 会议记录
+├── test/             # 测试文件
+├── .cursor/          # Cursor配置
+└── .husky/           # Git钩子
+```
+
+## 开发指南
+
+### 环境要求
+
+- Node.js >= 18
+- pnpm >= 8
+- Git >= 2.0
+
+### 安装依赖
+
+```bash
+pnpm install
+```
+
+### 开发命令
+
+```bash
+# 启动开发服务器
+pnpm start
+
+# 构建项目
+pnpm build
+
+# 运行测试
+pnpm test
+
+# 代码检查
+pnpm lint
+
+# 代码格式化
+pnpm format
+
+# 生成文档
+pnpm docs:generate
+```
+
+### 提交规范
+
+- feat: 新功能
+- fix: 修复问题
+- docs: 文档修改
+- style: 代码格式修改
+- refactor: 代码重构
+- perf: 性能优化
+- test: 测试相关
+- build: 构建相关
+- ci: CI配置
+- chore: 其他修改
+- revert: 回滚提交
+
+## 文档
+
+- [产品文档使用指南](docs/guide.md)
+- [AI工作流程指南](docs/ai-workflow.md)
+- [AI提示词模板](docs/ai-prompts.md)
+- [文档索引](docs/index.md)
+
+## 贡献指南
+
+1. Fork 项目
+2. 创建功能分支
+3. 提交更改
+4. 推送到分支
+5. 创建Pull Request
+
+## 许可证
+
+MIT
 
 ## 项目状态
 
