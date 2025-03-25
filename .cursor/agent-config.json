@@ -1,0 +1,141 @@
+{
+  "agent": {
+    "name": "ProductDesignAgent",
+    "version": "1.0.0",
+    "description": "产品设计AI助手",
+    "capabilities": [
+      "需求分析",
+      "用户研究",
+      "产品规划",
+      "原型设计",
+      "文档生成",
+      "代码实现"
+    ]
+  },
+  "workspace": {
+    "root": "/home/EduHub",
+    "templates": {
+      "prd": "docs/prd/template.prd.md",
+      "story": "docs/prd/template.story.md",
+      "research": "docs/research/template.research.md",
+      "test": "docs/test-reports/template.test.md",
+      "meeting": "docs/meeting-notes/template.meeting.md"
+    },
+    "output": {
+      "prd": "docs/prd/",
+      "story": "docs/prd/",
+      "research": "docs/research/",
+      "test": "docs/test-reports/",
+      "meeting": "docs/meeting-notes/"
+    }
+  },
+  "ai": {
+    "model": "gpt-4",
+    "temperature": 0.7,
+    "max_tokens": 4000,
+    "context_window": 8000,
+    "system_prompt": "你是一个专业的产品设计AI助手，擅长需求分析、用户研究和产品规划。"
+  },
+  "tools": {
+    "required": [
+      "codebase_search",
+      "read_file",
+      "edit_file",
+      "run_terminal_cmd",
+      "list_dir",
+      "grep_search"
+    ],
+    "optional": [
+      "file_search",
+      "semantic_search",
+      "code_completion"
+    ]
+  },
+  "workflow": {
+    "phases": [
+      {
+        "name": "需求分析",
+        "steps": [
+          "收集需求",
+          "分析可行性",
+          "制定方案"
+        ],
+        "outputs": [
+          "需求文档",
+          "可行性报告"
+        ]
+      },
+      {
+        "name": "产品设计",
+        "steps": [
+          "功能规划",
+          "原型设计",
+          "交互设计"
+        ],
+        "outputs": [
+          "产品需求文档",
+          "原型文件",
+          "交互说明"
+        ]
+      },
+      {
+        "name": "开发实现",
+        "steps": [
+          "技术方案",
+          "代码实现",
+          "测试验证"
+        ],
+        "outputs": [
+          "技术文档",
+          "源代码",
+          "测试报告"
+        ]
+      }
+    ]
+  },
+  "constraints": {
+    "code": {
+      "style": "TypeScript",
+      "framework": "NestJS",
+      "database": "SQLite",
+      "testing": "Jest"
+    },
+    "documentation": {
+      "format": "Markdown",
+      "language": "中文",
+      "version_control": "Git"
+    },
+    "security": {
+      "authentication": "JWT",
+      "authorization": "RBAC",
+      "data_encryption": "AES"
+    }
+  },
+  "quality": {
+    "code": {
+      "linting": "ESLint",
+      "formatting": "Prettier",
+      "testing": {
+        "unit": "Jest",
+        "e2e": "Jest"
+      }
+    },
+    "documentation": {
+      "spell_check": true,
+      "grammar_check": true,
+      "format_check": true
+    }
+  },
+  "integration": {
+    "version_control": {
+      "system": "Git",
+      "branch_strategy": "GitFlow",
+      "commit_convention": "Conventional Commits"
+    },
+    "ci_cd": {
+      "build": "pnpm",
+      "test": "Jest",
+      "deploy": "Docker"
+    }
+  }
+} 

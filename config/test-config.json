@@ -1,11 +1,11 @@
 {
-    "testString": "value",
-      "wrongIndentation": {
+  "testString": "value",
+  "wrongIndentation": {
     "nested": true
   },
   "longLine": "这是一个非常长的配置值，应该会触发80字符的标尺线，但是不会触发100字符的标尺线，用来测试格式化功能",
   "trailingComma": {
     "test1": true,
-    "test2": false,
+    "test2": false
   }
-} 
+}

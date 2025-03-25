@@ -1,0 +1,33 @@
+[gitflow "branch"]
+    master = main
+    develop = develop
+    feature = feature/
+    release = release/
+    hotfix = hotfix/
+    support = support/
+    versiontag = v
+
+[gitflow "prefix"]
+    feature = feature/
+    bugfix = bugfix/
+    release = release/
+    hotfix = hotfix/
+    support = support/
+    versiontag = v
+
+[gitflow "path"]
+    hooks = .git/hooks
+
+[gitflow "options"]
+    nosquash = true
+    nolog = false
+    nodeploy = false
+    nobackup = false
+    keepremote = false
+    keepbranch = false
+    force = false
+    fetch_all = false
+    rebase = false
+    autostash = false
+    verbose = false
+    defaults = false 

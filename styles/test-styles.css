@@ -1,22 +1,22 @@
 .test-class {
-    color: red;
-    padding: 10px;
-        margin: 20px;
+  color: red;
+  padding: 10px;
+  margin: 20px;
 }
 
 .wrong-indentation {
-      background: blue;
+  background: blue;
   border: 1px solid black;
 }
 
-.test-long-line { background: linear-gradient(to right, rgba(255,0,0,0), rgba(255,0,0,1), rgba(255,0,0,0)); }
+.test-long-line {
+  background: linear-gradient(to right, rgba(255, 0, 0, 0), rgba(255, 0, 0, 1), rgba(255, 0, 0, 0));
+}
 
 .multiple-empty-lines {
   display: block;
 }
 
-
-
-.trailing-spaces {    
-  position: relative;     
-} 
+.trailing-spaces {
+  position: relative;
+}
