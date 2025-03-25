@@ -1,128 +1,201 @@
 # 技术规范文档
 
-## 1. 技术栈规范
+## 1. 技术栈
 
-### 1.1 前端技术栈
+### 1.1 核心框架
+- Next.js 14
+- React 18
+- TypeScript 5
 
-- React 18.x
-- TypeScript 5.x
-- Ant Design 5.x
-- React Router 6.x
-- React Query
-- Axios
+### 1.2 数据层
+- Prisma ORM
+- SQLite 数据库
 
-### 1.2 后端技术栈
+### 1.3 认证与安全
+- NextAuth.js
+- Zod 数据验证
 
-- NestJS 10.x
-- TypeORM
-- SQLite
-- Jest
-- Swagger
+### 1.4 样式与UI
+- Tailwind CSS
+- PostCSS
+- Autoprefixer
 
-## 2. 代码规范
+## 2. 开发规范
 
-### 2.1 TypeScript规范
+### 2.1 代码风格
+- 使用 ESLint 和 Prettier 进行代码格式化
+- 遵循 TypeScript 严格模式
+- 使用函数组件和 Hooks
+- 遵循 React 最佳实践
 
-- 严格模式开启
-- 类型定义完整
-- 避免any类型
-- 接口优先设计
-- 枚举常量化
-
-### 2.2 React规范
-
-- 函数组件
-- Hooks最佳实践
-- 状态管理清晰
-- 组件职责单一
-- Props类型声明
-
-### 2.3 NestJS规范
-
-- 模块化设计
-- 依赖注入
-- 异常过滤器
-- 管道验证
-- 中间件规范
-
-## 3. 项目结构
-
-### 3.1 目录结构
-
+### 2.2 项目结构
 ```
 src/
-  ├── components/    # 组件
-  ├── contexts/      # 上下文
-  ├── controllers/   # 控制器
-  ├── dto/          # 数据传输对象
-  ├── entities/     # 实体
-  ├── pages/        # 页面
-  ├── routes/       # 路由
-  ├── server/       # 服务端
-  ├── services/     # 服务
-  ├── tasks/        # 任务
-  └── types/        # 类型定义
+├── app/                    # Next.js App Router 页面
+│   ├── (auth)/            # 认证相关页面
+│   │   ├── login/        # 登录页面
+│   │   └── register/     # 注册页面
+│   ├── (dashboard)/      # 仪表板页面
+│   │   ├── tasks/       # 任务管理
+│   │   ├── teaching/    # 教务管理
+│   │   ├── team/        # 团队协作
+│   │   └── reports/     # 数据统计
+│   └── api/              # API 路由
+├── components/           # React 组件
+│   ├── ui/              # UI 基础组件
+│   │   ├── board/      # 看板组件
+│   │   ├── task/       # 任务组件
+│   │   └── common/     # 通用组件
+│   └── features/        # 功能组件
+│       ├── teaching/   # 教务相关
+│       ├── team/       # 团队相关
+│       └── reports/    # 统计相关
+├── lib/                  # 工具函数和共享逻辑
+│   ├── auth/            # 认证相关
+│   ├── db/              # 数据库相关
+│   ├── teaching/        # 教务相关
+│   └── utils/           # 通用工具
+└── types/               # TypeScript 类型定义
+    ├── task.ts         # 任务类型
+    ├── teaching.ts     # 教务类型
+    └── user.ts         # 用户类型
 ```
 
-### 3.2 命名规范
+### 2.3 命名规范
+- 组件使用 PascalCase
+- 函数和变量使用 camelCase
+- 常量使用 UPPER_SNAKE_CASE
+- 类型和接口使用 PascalCase
+- 文件名使用 kebab-case
 
-- 文件名：kebab-case
-- 组件名：PascalCase
-- 变量名：camelCase
-- 常量名：UPPER_CASE
-- 类型名：PascalCase
+### 2.4 组件规范
+- 使用函数组件
+- 使用 TypeScript 类型
+- 遵循单一职责原则
+- 使用 React.memo 优化性能
+- 使用 ErrorBoundary 处理错误
 
-## 4. 开发规范
+### 2.5 状态管理
+- 使用 React Context 管理全局状态
+- 使用 React Query 管理服务端状态
+- 使用 Zustand 管理复杂状态
+- 避免过度使用状态管理
 
-### 4.1 Git规范
+### 2.6 性能优化
+- 使用 Next.js 图片优化
+- 实现组件懒加载
+- 优化首次加载性能
+- 实现增量静态再生成
+- 使用 React Suspense
 
-- 分支管理规范
-- 提交信息规范
-- 版本发布规范
-- 代码审查规范
+## 3. 数据库设计
 
-### 4.2 测试规范
+### 3.1 用户模型
+```prisma
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String?
+  role      Role     @default(USER)
+  tasks     Task[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
 
-- 单元测试必须
-- 集成测试覆盖
-- E2E测试关键流程
-- 测试代码规范
+enum Role {
+  ADMIN
+  TEACHER
+  USER
+}
+```
 
-### 4.3 文档规范
+### 3.2 任务模型
+```prisma
+model Task {
+  id          String   @id @default(cuid())
+  title       String
+  description String?
+  status      Status   @default(TODO)
+  priority    Priority @default(MEDIUM)
+  dueDate     DateTime?
+  assignee    User     @relation(fields: [assigneeId], references: [id])
+  assigneeId  String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
 
-- 代码注释完整
-- API文档及时
-- 组件文档齐全
-- 部署文档详细
+enum Status {
+  TODO
+  IN_PROGRESS
+  DONE
+}
 
-## 5. 性能规范
+enum Priority {
+  LOW
+  MEDIUM
+  HIGH
+}
+```
 
-### 5.1 前端性能
+## 4. API 设计
 
-- 代码分割
-- 懒加载
-- 缓存策略
-- 打包优化
+### 4.1 RESTful API
+- 使用 HTTP 方法表示操作
+- 使用复数名词表示资源
+- 使用嵌套表示关系
+- 使用查询参数过滤和排序
 
-### 5.2 后端性能
+### 4.2 响应格式
+```typescript
+interface ApiResponse<T> {
+  success: boolean;
+  data?: T;
+  error?: string;
+}
+```
 
-- 数据库优化
-- 缓存使用
-- 并发控制
-- 错误处理
+### 4.3 错误处理
+- 使用 HTTP 状态码
+- 返回详细的错误信息
+- 实现全局错误处理
+- 记录错误日志
 
-## 6. 安全规范
+## 5. 安全规范
 
-### 6.1 前端安全
+### 5.1 认证
+- 使用 NextAuth.js
+- 实现 JWT 认证
+- 支持多种登录方式
+- 实现会话管理
 
-- XSS防护
-- CSRF防护
-- 敏感信息加密
-- 权限控制
+### 5.2 授权
+- 基于角色的访问控制
+- 实现权限中间件
+- 验证用户权限
+- 保护 API 路由
 
-### 6.2 后端安全
+### 5.3 数据安全
+- 使用 HTTPS
+- 实现 CSRF 保护
+- 加密敏感数据
+- 实现速率限制
 
-- 参数验证
-- SQL注入防护
-- 日志脱敏
-- 认证授权
+## 6. 部署规范
+
+### 6.1 环境变量
+- 使用 .env 文件
+- 区分开发和生产环境
+- 保护敏感信息
+- 使用环境变量验证
+
+### 6.2 构建优化
+- 优化构建配置
+- 实现代码分割
+- 优化资源加载
+- 实现缓存策略
+
+### 6.3 监控和日志
+- 实现错误监控
+- 记录访问日志
+- 监控性能指标
+- 实现告警机制

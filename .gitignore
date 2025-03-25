@@ -1,14 +1,61 @@
 # Dependencies
-node_modules/
-.pnpm-store/
+node_modules
+.pnp
+.pnp.js
 
-# Build outputs
-dist/
-build/
+# Testing
+coverage
+
+# Next.js
+.next/
 out/
+build
+dist
+
+# Misc
+.DS_Store
+*.pem
+
+# Debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# Local env files
+.env
+.env*.local
+
+# Vercel
+.vercel
+
+# TypeScript
+*.tsbuildinfo
+next-env.d.ts
+
+# IDE
+.idea
+.vscode
+*.swp
+*.swo
+
+# Logs
+logs
+*.log
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+
+# Uploads
+uploads/
+
+# Cache
+.cache
+.temp
 
 # Environment files
-.env
 .env.local
 .env.*.local
 
@@ -37,17 +84,9 @@ coverage/
 test-results/
 
 # System files
-.DS_Store
 Thumbs.db
 
-# SQLite database files
-*.sqlite
-*.sqlite3
-*.db
-
 # Cache
-.cache/
-.temp/
 .eslintcache
 .npm/
 .yarn/cache
@@ -66,12 +105,9 @@ Thumbs.db
 .cache/
 
 # 上传文件
-uploads/
 public/uploads/
 
 # 临时目录
-temp/
-tmp/
 *.pid
 
 # 开发工具优化
@@ -81,9 +117,6 @@ dist-ssr
 # 环境文件
 .env.*
 !.env.example
-
-# TypeScript
-*.tsbuildinfo
 
 # 文档生成
 docs/_site/

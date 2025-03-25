@@ -1,19 +1,107 @@
-# EduHub 行政办公任务跟踪管理中心
+# EduHub 教务中心任务看板系统
+
+基于 Cursor Agent 全自动开发的任务看板系统，专注于小学教务中心日常办公任务管理。
 
 ## 项目简介
 
-EduHub 是一个基于Cursor agent自动开发的行政办公任务跟踪管理中心，旨在提供完整的任务管理功能。本项目采用AI驱动的开发方式，通过Cursor agent实现需求分析、产品设计、开发实现的全流程自动化。
+EduHub 是一个基于 Cursor Agent 全自动开发的任务看板（教务中心）系统，以任务管理为核心，支持小学日常办公任务管理工作。系统设计轻量级、高效、易维护，区别于传统的教育管理系统。
+
+## 核心功能
+
+### 任务看板管理
+- 教务任务分配与跟踪
+- 任务状态可视化
+- 任务优先级管理
+- 任务截止时间管理
+- 任务依赖关系
+
+### 教务管理
+- 课程任务管理
+- 教学计划跟踪
+- 教学质量评估
+- 教学资源管理
+- 教务通知发布
+
+### 团队协作
+- 教务团队管理
+- 任务分配与转交
+- 团队进度追踪
+- 协作通知
+- 工作反馈
+
+### 数据统计
+- 任务完成率统计
+- 教学质量分析
+- 教学进度报表
+- 教师工作量统计
+- 学生学习情况
 
 ## 技术栈
 
-- 后端框架：NestJS
-- 数据库：SQLite
-- 前端框架：React
-- 开发语言：TypeScript
-- 包管理器：pnpm
-- 代码规范：ESLint + Prettier
-- 版本控制：Git Flow
-- 自动化工具：Husky + lint-staged
+- Next.js 14
+- React 18
+- TypeScript 5
+- Prisma + SQLite
+- NextAuth.js
+- Tailwind CSS
+- Zod
+
+## 开发环境要求
+
+- Node.js 18+
+- pnpm 8+
+- Git
+
+## 快速开始
+
+1. 安装依赖
+```bash
+pnpm install
+```
+
+2. 启动开发服务器
+```bash
+pnpm dev
+```
+
+3. 构建生产版本
+```bash
+pnpm build
+```
+
+4. 启动生产服务器
+```bash
+pnpm start
+```
+
+## 项目结构
+
+```
+src/
+├── app/                    # Next.js App Router 页面
+│   ├── api/               # API 路由
+│   ├── auth/              # 认证相关页面
+│   └── dashboard/         # 仪表板页面
+├── components/            # React 组件
+│   ├── ui/               # UI 基础组件
+│   └── features/         # 功能组件
+├── lib/                   # 工具函数和共享逻辑
+│   ├── auth/             # 认证相关
+│   ├── db/               # 数据库相关
+│   └── utils/            # 通用工具
+└── types/                # TypeScript 类型定义
+```
+
+## 开发规范
+
+- 使用 TypeScript 进行类型检查
+- 遵循 Next.js 最佳实践
+- 使用 ESLint 和 Prettier 进行代码格式化
+- 遵循 Git 提交规范
+
+## 许可证
+
+MIT
 
 ## 功能特性
 
@@ -149,10 +237,6 @@ pnpm docs:generate
 3. 提交更改
 4. 推送到分支
 5. 创建Pull Request
-
-## 许可证
-
-MIT
 
 ## 项目状态
 
