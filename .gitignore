@@ -33,6 +33,8 @@ pnpm-debug.log*
 
 # Testing
 coverage/
+.nyc_output/
+test-results/
 
 # System files
 .DS_Store
@@ -47,6 +49,11 @@ Thumbs.db
 .cache/
 .temp/
 .eslintcache
+.npm/
+.yarn/cache
+.yarn/unplugged
+.yarn/build-state.yml
+.yarn/install-state.gz
 
 # 证书和密钥
 *.pem
@@ -76,4 +83,20 @@ dist-ssr
 !.env.example
 
 # TypeScript
-*.tsbuildinfo 
+*.tsbuildinfo
+
+# 文档生成
+docs/_site/
+docs/.docusaurus
+docs/.cache-loader
+.docz/
+.typedoc/
+
+# 性能分析
+*.heapsnapshot
+*.cpuprofile
+
+# 其他
+.history/
+.git/
+.husky/_/ 
