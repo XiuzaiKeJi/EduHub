@@ -1,0 +1,11 @@
+packages:
+  # 所有包的根目录
+  - 'packages/*'
+  # 所有应用的根目录
+  - 'apps/*'
+  # 共享的工具和配置
+  - 'shared/*'
+  # 排除所有 node_modules
+  - '!**/node_modules'
+  # 排除所有构建输出
+  - '!**/dist' 

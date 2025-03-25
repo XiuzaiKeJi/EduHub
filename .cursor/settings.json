@@ -1,0 +1,115 @@
+{
+  "editor": {
+    "formatOnSave": true,
+    "defaultFormatter": "prettier",
+    "tabSize": 2,
+    "rulers": [80, 100],
+    "wordWrap": "on",
+    "bracketPairColorization": true,
+    "guides": {
+      "bracketPairs": true,
+      "indentation": true
+    },
+    "suggestSelection": "first",
+    "quickSuggestions": {
+      "comments": true,
+      "strings": true,
+      "other": true
+    }
+  },
+  "files": {
+    "autoSave": "onFocusChange",
+    "trimTrailingWhitespace": true,
+    "insertFinalNewline": true,
+    "trimFinalNewlines": true,
+    "associations": {
+      "*.prd.md": "markdown",
+      "*.story.md": "markdown",
+      "*.test.md": "markdown",
+      "*.research.md": "markdown"
+    },
+    "exclude": {
+      "**/node_modules": true,
+      "**/dist": true,
+      "**/.git": true,
+      "**/temp": true
+    },
+    "watcherExclude": {
+      "**/node_modules": true,
+      "**/dist": true
+    }
+  },
+  "search": {
+    "exclude": {
+      "**/node_modules": true,
+      "**/dist": true,
+      "**/.git": true
+    },
+    "quickOpen": {
+      "includeSymbols": true
+    }
+  },
+  "workbench": {
+    "iconTheme": "material-icon-theme",
+    "colorTheme": "GitHub Light",
+    "editor.semanticHighlighting.enabled": true
+  },
+  "markdown": {
+    "preview.breaks": true,
+    "preview.linkify": true,
+    "preview.typographer": true,
+    "preview.fontFamily": "-apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI'",
+    "preview.fontSize": 14,
+    "preview.lineHeight": 1.6
+  },
+  "todo": {
+    "file": "todo.md",
+    "include": [
+      "**/*.md",
+      "**/*.ts",
+      "**/*.tsx"
+    ],
+    "exclude": [
+      "**/node_modules/**",
+      "**/dist/**"
+    ],
+    "markers": {
+      "TODO": "any",
+      "FIXME": "error",
+      "NOTE": "info",
+      "REVIEW": "warning"
+    }
+  },
+  "git": {
+    "autofetch": true,
+    "confirmSync": true,
+    "enableSmartCommit": true
+  },
+  "typescript": {
+    "suggest": {
+      "completeFunctionCalls": true,
+      "autoImports": true
+    },
+    "updateImportsOnFileMove": "always",
+    "preferences": {
+      "importModuleSpecifier": "relative"
+    }
+  },
+  "javascript": {
+    "suggest": {
+      "completeFunctionCalls": true,
+      "autoImports": true
+    },
+    "updateImportsOnFileMove": "always"
+  },
+  "eslint": {
+    "enable": true,
+    "run": "onSave",
+    "packageManager": "pnpm"
+  },
+  "prettier": {
+    "enable": true,
+    "requireConfig": true,
+    "useEditorConfig": true
+  }
+}

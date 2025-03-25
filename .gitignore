@@ -1,1 +1,135 @@
- 
+# Dependencies
+node_modules
+.pnp
+.pnp.js
+
+# Testing
+coverage
+
+# Next.js
+.next/
+out/
+build
+dist
+
+# Misc
+.DS_Store
+*.pem
+
+# Debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# Local env files
+.env
+.env*.local
+
+# Vercel
+.vercel
+
+# TypeScript
+*.tsbuildinfo
+next-env.d.ts
+
+# IDE
+.idea
+.vscode
+*.swp
+*.swo
+
+# Logs
+logs
+*.log
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+
+# Uploads
+uploads/
+
+# Cache
+.cache
+.temp
+
+# Environment files
+.env.local
+.env.*.local
+
+# IDE
+.idea/
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Testing
+coverage/
+.nyc_output/
+test-results/
+
+# System files
+Thumbs.db
+
+# Cache
+.eslintcache
+.npm/
+.yarn/cache
+.yarn/unplugged
+.yarn/build-state.yml
+.yarn/install-state.gz
+
+# 证书和密钥
+*.pem
+*.key
+*.crt
+
+# 临时文件
+*.tmp
+*.temp
+.cache/
+
+# 上传文件
+public/uploads/
+
+# 临时目录
+*.pid
+
+# 开发工具优化
+dist-ssr
+*.local
+
+# 环境文件
+.env.*
+!.env.example
+
+# 文档生成
+docs/_site/
+docs/.docusaurus
+docs/.cache-loader
+.docz/
+.typedoc/
+
+# 性能分析
+*.heapsnapshot
+*.cpuprofile
+
+# 其他
+.history/
+.git/
+.husky/_/ 

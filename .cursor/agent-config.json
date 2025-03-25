@@ -1,0 +1,89 @@
+{
+  "name": "EduHub Agent",
+  "description": "EduHub 教务中心任务看板系统的 AI 开发助手",
+  "version": "1.0.0",
+  "framework": "Next.js",
+  "rules": {
+    "project": {
+      "name": "EduHub",
+      "type": "教务中心任务看板系统",
+      "description": "基于 Cursor Agent 全自动开发的任务看板系统，专注于小学教务中心日常办公任务管理",
+      "structure": {
+        "src/": {
+          "app/": "Next.js App Router 页面",
+          "components/": "React 组件",
+          "lib/": "工具函数和共享逻辑",
+          "types/": "TypeScript 类型定义"
+        },
+        "prisma/": "数据库模型和迁移",
+        "public/": "静态资源",
+        "docs/": "项目文档"
+      }
+    },
+    "development": {
+      "language": "TypeScript",
+      "style": {
+        "formatting": ["ESLint", "Prettier"],
+        "naming": {
+          "components": "PascalCase",
+          "functions": "camelCase",
+          "constants": "UPPER_SNAKE_CASE",
+          "types": "PascalCase",
+          "files": "kebab-case"
+        }
+      },
+      "components": {
+        "type": "function",
+        "state": "hooks",
+        "styling": "Tailwind CSS"
+      }
+    },
+    "database": {
+      "orm": "Prisma",
+      "database": "SQLite",
+      "models": {
+        "User": {
+          "fields": ["id", "email", "name", "role", "tasks", "createdAt", "updatedAt"]
+        },
+        "Task": {
+          "fields": ["id", "title", "description", "status", "priority", "dueDate", "assigneeId", "createdAt", "updatedAt"]
+        }
+      }
+    },
+    "authentication": {
+      "provider": "NextAuth.js",
+      "features": ["JWT", "角色管理", "权限控制"]
+    },
+    "testing": {
+      "types": ["单元测试", "集成测试", "E2E测试"],
+      "coverage": "80%"
+    },
+    "deployment": {
+      "environment": {
+        "development": "本地开发",
+        "production": "生产环境"
+      },
+      "requirements": {
+        "node": ">=18",
+        "pnpm": ">=8"
+      }
+    }
+  },
+  "features": {
+    "taskBoard": {
+      "name": "任务看板",
+      "priority": "high",
+      "components": ["看板视图", "任务卡片", "拖拽功能"]
+    },
+    "teaching": {
+      "name": "教务管理",
+      "priority": "high",
+      "components": ["课程管理", "计划管理", "资源管理"]
+    },
+    "team": {
+      "name": "团队协作",
+      "priority": "medium",
+      "components": ["团队管理", "任务分配", "进度追踪"]
+    }
+  }
+} 
