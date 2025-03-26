@@ -1,13 +1,11 @@
-import type { Metadata } from "next";
+'use client';
+
 import { Inter } from "next/font/google";
 import "./globals.css";
+import { Layout } from "@/components/layout/Layout";
+import { SessionProvider } from "next-auth/react";
 
 const inter = Inter({ subsets: ["latin"] });
-
-export const metadata: Metadata = {
-  title: "EduHub - 教育协作平台",
-  description: "现代化的教育管理平台",
-};
 
 export default function RootLayout({
   children,
@@ -16,7 +14,11 @@ export default function RootLayout({
 }) {
   return (
     <html lang="zh">
-      <body className={inter.className}>{children}</body>
+      <body className={inter.className}>
+        <SessionProvider>
+          <Layout>{children}</Layout>
+        </SessionProvider>
+      </body>
     </html>
   );
 }
