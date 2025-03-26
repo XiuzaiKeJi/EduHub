@@ -11,8 +11,15 @@ export interface LoginAttempt {
   remainingTime: number;
 }
 
+export interface ReCaptchaResult {
+  success: boolean;
+  error?: string;
+}
+
 const MAX_ATTEMPTS = 5;
 const BLOCK_DURATION = 15 * 60 * 1000; // 15分钟，单位：毫秒
+const RECAPTCHA_SECRET_KEY = process.env.RECAPTCHA_SECRET_KEY;
+const RECAPTCHA_VERIFY_URL = 'https://www.google.com/recaptcha/api/siteverify';
 
 export function validatePassword(password: string): PasswordStrength {
   const minLength = 8;
@@ -123,4 +130,35 @@ export function formatRemainingTime(ms: number): string {
   const minutes = Math.floor(ms / 60000);
   const seconds = Math.floor((ms % 60000) / 1000);
   return `${minutes}分${seconds}秒`;
+}
+
+export async function verifyReCaptcha(token: string): Promise<ReCaptchaResult> {
+  try {
+    const formData = new URLSearchParams();
+    formData.append('secret', RECAPTCHA_SECRET_KEY || '');
+    formData.append('response', token);
+
+    const response = await fetch(RECAPTCHA_VERIFY_URL, {
+      method: 'POST',
+      body: formData,
+    });
+
+    const data = await response.json();
+
+    if (!data.success) {
+      return {
+        success: false,
+        error: '人机验证失败，请重试',
+      };
+    }
+
+    return {
+      success: true,
+    };
+  } catch (error) {
+    return {
+      success: false,
+      error: '人机验证服务不可用，请稍后重试',
+    };
+  }
 } 

@@ -1,4 +1,4 @@
-import { validatePassword, checkLoginAttempt, updateLoginAttempt, formatRemainingTime } from '../(auth)/login/utils';
+import { validatePassword, checkLoginAttempt, updateLoginAttempt, formatRemainingTime, verifyReCaptcha } from '../(auth)/login/utils';
 
 // Mock localStorage
 const localStorageMock = (() => {
@@ -15,6 +15,10 @@ const localStorageMock = (() => {
 })();
 
 Object.defineProperty(window, 'localStorage', { value: localStorageMock });
+
+// Mock fetch
+const fetchMock = jest.fn();
+global.fetch = fetchMock;
 
 describe('validatePassword', () => {
   it('should return invalid for short password', () => {
@@ -144,5 +148,47 @@ describe('Login Attempt Management', () => {
       expect(formatRemainingTime(45000)).toBe('0分45秒');
       expect(formatRemainingTime(900000)).toBe('15分0秒');
     });
+  });
+});
+
+describe('ReCaptcha Verification', () => {
+  beforeEach(() => {
+    fetchMock.mockClear();
+  });
+
+  it('should verify valid reCAPTCHA token', async () => {
+    fetchMock.mockResolvedValueOnce({
+      json: () => Promise.resolve({ success: true }),
+    });
+
+    const result = await verifyReCaptcha('valid-token');
+    expect(result.success).toBe(true);
+    expect(result.error).toBeUndefined();
+
+    expect(fetchMock).toHaveBeenCalledWith(
+      'https://www.google.com/recaptcha/api/siteverify',
+      {
+        method: 'POST',
+        body: expect.any(URLSearchParams),
+      }
+    );
+  });
+
+  it('should handle invalid reCAPTCHA token', async () => {
+    fetchMock.mockResolvedValueOnce({
+      json: () => Promise.resolve({ success: false }),
+    });
+
+    const result = await verifyReCaptcha('invalid-token');
+    expect(result.success).toBe(false);
+    expect(result.error).toBe('人机验证失败，请重试');
+  });
+
+  it('should handle network error', async () => {
+    fetchMock.mockRejectedValueOnce(new Error('Network error'));
+
+    const result = await verifyReCaptcha('valid-token');
+    expect(result.success).toBe(false);
+    expect(result.error).toBe('人机验证服务不可用，请稍后重试');
   });
 }); 
