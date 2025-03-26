@@ -1,8 +1,10 @@
+export type UserRole = 'STUDENT' | 'TEACHER' | 'ADMIN'
+
 export interface User {
   id: string
   email: string
   name: string
-  role: 'STUDENT' | 'TEACHER' | 'ADMIN'
+  role: UserRole
   createdAt: Date
   updatedAt: Date
 }
