@@ -3,6 +3,47 @@
   "description": "EduHub 教务中心任务看板系统的 AI 开发助手",
   "version": "1.0.0",
   "framework": "Next.js",
+  "developmentPhases": {
+    "initialization": {
+      "productDesign": {
+        "tasks": ["需求分析", "功能规划", "UI/UX设计", "技术选型"],
+        "deliverables": ["PRD文档", "原型设计", "技术方案"]
+      },
+      "versionPlanning": {
+        "tasks": ["版本规划", "里程碑制定", "发布计划"],
+        "deliverables": ["版本路线图", "发布计划文档"]
+      },
+      "environmentSetup": {
+        "tasks": ["开发环境配置", "CI/CD配置", "代码规范设置"],
+        "deliverables": ["环境配置文档", "代码规范文档"]
+      }
+    },
+    "planning": {
+      "developmentPlan": {
+        "tasks": ["功能分解", "任务排期", "资源分配"],
+        "deliverables": ["开发计划文档", "甘特图"]
+      },
+      "trackingSystem": {
+        "tasks": ["进度跟踪机制", "质量控制机制", "风险管理"],
+        "deliverables": ["进度跟踪文档", "质量控制文档"]
+      }
+    },
+    "implementation": {
+      "taskBreakdown": {
+        "method": "原子功能分解",
+        "criteria": ["功能独立性", "可测试性", "可维护性"]
+      },
+      "development": {
+        "workflow": ["编码", "测试", "文档", "提交"],
+        "standards": {
+          "coding": ["TypeScript", "ESLint", "Prettier"],
+          "testing": ["Jest", "React Testing Library"],
+          "documentation": ["JSDoc", "Markdown"],
+          "git": ["Conventional Commits"]
+        }
+      }
+    }
+  },
   "rules": {
     "project": {
       "name": "EduHub",
@@ -17,7 +58,12 @@
         },
         "prisma/": "数据库模型和迁移",
         "public/": "静态资源",
-        "docs/": "项目文档"
+        "docs/": {
+          "product/": "产品文档",
+          "development/": "开发文档",
+          "technical/": "技术文档",
+          "api/": "API文档"
+        }
       }
     },
     "development": {
@@ -56,7 +102,12 @@
     },
     "testing": {
       "types": ["单元测试", "集成测试", "E2E测试"],
-      "coverage": "80%"
+      "coverage": "80%",
+      "tools": {
+        "unit": "Jest",
+        "integration": "React Testing Library",
+        "e2e": "Cypress"
+      }
     },
     "deployment": {
       "environment": {
@@ -73,17 +124,60 @@
     "taskBoard": {
       "name": "任务看板",
       "priority": "high",
-      "components": ["看板视图", "任务卡片", "拖拽功能"]
+      "atomicFeatures": [
+        {
+          "name": "任务创建",
+          "components": ["表单组件", "验证逻辑", "API集成"]
+        },
+        {
+          "name": "任务列表",
+          "components": ["列表视图", "过滤功能", "排序功能"]
+        },
+        {
+          "name": "任务详情",
+          "components": ["详情页面", "编辑功能", "状态管理"]
+        },
+        {
+          "name": "看板视图",
+          "components": ["拖拽功能", "状态列", "任务卡片"]
+        }
+      ]
     },
     "teaching": {
       "name": "教务管理",
       "priority": "high",
-      "components": ["课程管理", "计划管理", "资源管理"]
+      "atomicFeatures": [
+        {
+          "name": "课程管理",
+          "components": ["课程列表", "课程详情", "课程编辑"]
+        },
+        {
+          "name": "教学计划",
+          "components": ["计划制定", "进度跟踪", "评估反馈"]
+        },
+        {
+          "name": "资源管理",
+          "components": ["资源上传", "资源分类", "资源搜索"]
+        }
+      ]
     },
     "team": {
       "name": "团队协作",
       "priority": "medium",
-      "components": ["团队管理", "任务分配", "进度追踪"]
+      "atomicFeatures": [
+        {
+          "name": "成员管理",
+          "components": ["成员列表", "角色分配", "权限管理"]
+        },
+        {
+          "name": "任务分配",
+          "components": ["分配界面", "通知系统", "进度跟踪"]
+        },
+        {
+          "name": "协作空间",
+          "components": ["讨论区", "文件共享", "日程安排"]
+        }
+      ]
     }
   }
 } 

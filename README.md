@@ -51,6 +51,45 @@ EduHub 是一个基于 Cursor Agent 全自动开发的任务看板（教务中�
 - Node.js 18+
 - pnpm 8+
 - Git
+- Cursor IDE
+
+## 项目结构
+
+```
+.
+├── src/                    # 源代码目录
+│   ├── app/               # Next.js App Router 页面
+│   │   ├── api/          # API 路由
+│   │   ├── auth/         # 认证相关页面
+│   │   └── dashboard/    # 仪表板页面
+│   ├── components/       # React 组件
+│   │   ├── ui/          # UI 基础组件
+│   │   └── features/    # 功能组件
+│   ├── lib/             # 工具函数和共享逻辑
+│   │   ├── auth/       # 认证相关
+│   │   ├── db/         # 数据库相关
+│   │   └── utils/      # 通用工具
+│   └── types/          # TypeScript 类型定义
+├── docs/                # 文档目录
+│   ├── development/    # 开发相关文档
+│   │   ├── workflow.md # 开发工作流指南
+│   │   ├── ai-development.md # AI开发指南
+│   │   └── cursor-guidelines.md # Cursor IDE使用指南
+│   ├── product/        # 产品相关文档
+│   │   ├── guide.md    # 产品文档编写规范
+│   │   └── prd/        # 产品需求文档
+│   │       ├── task-management.prd.md # 任务管理模块PRD
+│   │       └── task-management.story.md # 任务管理模块用户故事
+│   ├── test-reports/   # 测试相关文档
+│   │   └── guide.md    # 测试文档编写规范
+│   └── meeting-notes/  # 会议记录
+│       └── guide.md    # 会议记录编写规范
+├── prisma/             # Prisma 数据库配置
+├── public/            # 静态资源
+├── tests/            # 测试文件
+├── .cursor/          # Cursor配置
+└── .husky/           # Git钩子
+```
 
 ## 快速开始
 
@@ -74,124 +113,11 @@ pnpm build
 pnpm start
 ```
 
-## 项目结构
-
-```
-src/
-├── app/                    # Next.js App Router 页面
-│   ├── api/               # API 路由
-│   ├── auth/              # 认证相关页面
-│   └── dashboard/         # 仪表板页面
-├── components/            # React 组件
-│   ├── ui/               # UI 基础组件
-│   └── features/         # 功能组件
-├── lib/                   # 工具函数和共享逻辑
-│   ├── auth/             # 认证相关
-│   ├── db/               # 数据库相关
-│   └── utils/            # 通用工具
-└── types/                # TypeScript 类型定义
-```
-
-## 开发规范
-
-- 使用 TypeScript 进行类型检查
-- 遵循 Next.js 最佳实践
-- 使用 ESLint 和 Prettier 进行代码格式化
-- 遵循 Git 提交规范
-
-## 许可证
-
-MIT
-
-## 功能特性
-
-- 任务管理
-
-  - 任务创建与分配
-  - 任务状态跟踪
-  - 任务优先级管理
-  - 任务依赖关系
-  - 任务截止时间管理
-
-- 团队协作
-
-  - 团队成员管理
-  - 任务分配与转交
-  - 团队进度追踪
-  - 协作通知
-
-- 报表统计
-
-  - 任务完成率统计
-  - 团队工作量分析
-  - 项目进度报表
-  - 绩效评估
-
-- 系统管理
-  - 用户权限管理
-  - 系统配置管理
-  - 日志审计
-  - 数据备份
-
-## 开发流程
-
-1. 需求分析
-
-   - AI需求收集
-   - 需求分类与优先级
-   - 可行性评估
-
-2. 产品设计
-
-   - 功能规划
-   - 原型设计
-   - 文档生成
-
-3. 开发实现
-
-   - 技术方案
-   - 代码实现
-   - 测试验证
-
-4. 发布部署
-   - 代码审查
-   - 测试验证
-   - 部署上线
-
-## 项目结构
-
-```
-EduHub/
-├── src/                # 源代码
-├── docs/              # 文档
-│   ├── prd/          # 产品需求文档
-│   ├── research/     # 研究文档
-│   ├── test-reports/ # 测试报告
-│   └── meeting-notes/# 会议记录
-├── test/             # 测试文件
-├── .cursor/          # Cursor配置
-└── .husky/           # Git钩子
-```
-
-## 开发指南
-
-### 环境要求
-
-- Node.js >= 18
-- pnpm >= 8
-- Git >= 2.0
-
-### 安装依赖
-
-```bash
-pnpm install
-```
-
-### 开发命令
+## 开发命令
 
 ```bash
 # 启动开发服务器
-pnpm start
+pnpm dev
 
 # 构建项目
 pnpm build
@@ -209,77 +135,37 @@ pnpm format
 pnpm docs:generate
 ```
 
-### 提交规范
+## 开发规范
 
+### 代码规范
+- 使用 TypeScript 进行类型检查
+- 遵循 Next.js 最佳实践
+- 使用 ESLint 和 Prettier 进行代码格式化
+- 遵循 Git 提交规范
+
+### 文档规范
+- 所有文档使用 Markdown 格式
+- 文档必须包含最后更新时间
+- 重要文档需要经过评审
+- 文档变更需要记录在版本控制中
+
+### 提交规范
 - feat: 新功能
 - fix: 修复问题
 - docs: 文档修改
 - style: 代码格式修改
 - refactor: 代码重构
-- perf: 性能优化
-- test: 测试相关
-- build: 构建相关
-- ci: CI配置
+- test: 测试用例修改
 - chore: 其他修改
-- revert: 回滚提交
-
-## 文档
-
-- [产品文档使用指南](docs/guide.md)
-- [AI工作流程指南](docs/ai-workflow.md)
-- [AI提示词模板](docs/ai-prompts.md)
-- [文档索引](docs/index.md)
 
 ## 贡献指南
 
 1. Fork 项目
-2. 创建功能分支
-3. 提交更改
+2. 创建特性分支
+3. 提交变更
 4. 推送到分支
-5. 创建Pull Request
+5. 创建 Pull Request
 
-## 项目状态
+## 许可证
 
-项目已终止开发。
-
-## 经验总结
-
-1. 技术架构
-
-   - 模块化设计
-   - 依赖注入
-   - 数据模型设计
-   - 错误处理
-   - 日志记录
-
-2. 开发实践
-
-   - 单元测试
-   - 集成测试
-   - 代码审查
-   - 性能优化
-   - 安全实践
-
-3. 项目管理
-   - 版本控制
-   - 需求管理
-   - 进度跟踪
-   - 团队协作
-   - 文档管理
-
-## 改进建议
-
-1. 技术改进
-
-   - 架构优化
-   - 工具改进
-   - 测试策略
-   - 性能优化
-   - 安全加强
-
-2. 管理改进
-   - 流程优化
-   - 团队建设
-   - 质量控制
-   - 知识共享
-   - 沟通机制
+MIT License
