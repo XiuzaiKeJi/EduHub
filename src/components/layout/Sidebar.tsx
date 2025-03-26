@@ -2,13 +2,12 @@ import { useState } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useSession } from 'next-auth/react'
-import { UserRole } from '@/types'
 
 interface SidebarItem {
   name: string
   href: string
   icon: React.ReactNode
-  role?: UserRole
+  role?: string
 }
 
 export default function Sidebar() {
@@ -92,7 +91,7 @@ export default function Sidebar() {
           />
         </svg>
       ),
-      role: UserRole.TEACHER,
+      role: 'TEACHER',
     },
     {
       name: '管理',
@@ -118,7 +117,7 @@ export default function Sidebar() {
           />
         </svg>
       ),
-      role: UserRole.ADMIN,
+      role: 'ADMIN',
     },
   ]
 

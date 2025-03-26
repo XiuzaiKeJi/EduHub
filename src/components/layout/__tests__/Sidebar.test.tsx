@@ -39,9 +39,10 @@ describe('Sidebar', () => {
     render(<Sidebar />)
 
     // 检查基本导航项
-    expect(screen.getByText('仪表盘')).toBeInTheDocument()
-    expect(screen.getByText('课程')).toBeInTheDocument()
-    expect(screen.getByText('任务')).toBeInTheDocument()
+    const nav = screen.getByRole('navigation')
+    expect(nav).toHaveTextContent('仪表盘')
+    expect(nav).toHaveTextContent('课程')
+    expect(nav).toHaveTextContent('任务')
   })
 
   it('shows teacher navigation items for teacher role', () => {
@@ -57,7 +58,8 @@ describe('Sidebar', () => {
 
     render(<Sidebar />)
 
-    expect(screen.getByText('团队')).toBeInTheDocument()
+    const nav = screen.getByRole('navigation')
+    expect(nav).toHaveTextContent('团队')
   })
 
   it('shows admin navigation items for admin role', () => {
@@ -73,7 +75,8 @@ describe('Sidebar', () => {
 
     render(<Sidebar />)
 
-    expect(screen.getByText('管理')).toBeInTheDocument()
+    const nav = screen.getByRole('navigation')
+    expect(nav).toHaveTextContent('管理')
   })
 
   it('toggles sidebar collapse state when collapse button is clicked', () => {
@@ -85,18 +88,19 @@ describe('Sidebar', () => {
     render(<Sidebar />)
 
     // 初始状态应该是展开的
-    expect(screen.getByText('仪表盘')).toBeInTheDocument()
-    expect(screen.getByText('课程')).toBeInTheDocument()
-    expect(screen.getByText('任务')).toBeInTheDocument()
+    const nav = screen.getByRole('navigation')
+    expect(nav).toHaveTextContent('仪表盘')
+    expect(nav).toHaveTextContent('课程')
+    expect(nav).toHaveTextContent('任务')
 
     // 点击折叠按钮
     const collapseButton = screen.getByRole('button')
     fireEvent.click(collapseButton)
 
     // 检查文本是否隐藏
-    expect(screen.queryByText('仪表盘')).not.toBeInTheDocument()
-    expect(screen.queryByText('课程')).not.toBeInTheDocument()
-    expect(screen.queryByText('任务')).not.toBeInTheDocument()
+    expect(nav).not.toHaveTextContent('仪表盘')
+    expect(nav).not.toHaveTextContent('课程')
+    expect(nav).not.toHaveTextContent('任务')
   })
 
   it('highlights active navigation item', () => {
@@ -111,7 +115,7 @@ describe('Sidebar', () => {
     render(<Sidebar />)
 
     // 检查课程链接是否有高亮样式
-    const coursesLink = screen.getByText('课程').closest('a')
+    const coursesLink = screen.getByRole('link', { name: '课程' })
     expect(coursesLink).toHaveClass('bg-gray-100', 'text-gray-900')
   })
 }) 

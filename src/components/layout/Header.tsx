@@ -1,7 +1,8 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { useSession } from 'next-auth/react'
-import { UserRole } from '@/types'
+
+type UserRole = 'STUDENT' | 'TEACHER' | 'ADMIN'
 
 export default function Header() {
   const { data: session } = useSession()
@@ -15,10 +16,10 @@ export default function Header() {
   ]
 
   // 根据用户角色添加导航项
-  if (session?.user?.role === UserRole.TEACHER) {
+  if (session?.user?.role === 'TEACHER') {
     navigation.push({ name: '团队', href: '/teams' })
   }
-  if (session?.user?.role === UserRole.ADMIN) {
+  if (session?.user?.role === 'ADMIN') {
     navigation.push({ name: '管理', href: '/admin' })
   }
 
