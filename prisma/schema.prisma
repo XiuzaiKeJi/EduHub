@@ -23,7 +23,7 @@ model User {
   name          String
   email         String    @unique
   password      String
-  role          UserRole  @default(STUDENT)
+  role          String    @default("STUDENT")
   department    String?
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt

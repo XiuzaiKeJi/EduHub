@@ -1,7 +1,7 @@
 import { render, screen, fireEvent } from '@testing-library/react'
+import Sidebar from '../Sidebar'
 import { useSession } from 'next-auth/react'
 import { usePathname } from 'next/navigation'
-import Sidebar from '../Sidebar'
 
 // Mock next-auth
 jest.mock('next-auth/react', () => ({
@@ -14,108 +14,122 @@ jest.mock('next/navigation', () => ({
 }))
 
 // Mock next/link
-jest.mock('next/link', () => ({
-  __esModule: true,
-  default: ({ children, href }: { children: React.ReactNode; href: string }) => (
+jest.mock('next/link', () => {
+  return ({ children, href }: { children: React.ReactNode; href: string }) => (
     <a href={href}>{children}</a>
-  ),
-}))
+  )
+})
+
+const defaultItems = [
+  { href: '/dashboard', label: '仪表盘' },
+  { href: '/courses', label: '课程' },
+  { href: '/tasks', label: '任务' },
+  { href: '/teams', label: '团队', role: 'TEACHER' },
+  { href: '/admin', label: '管理', role: 'ADMIN' },
+]
 
 describe('Sidebar', () => {
+  const mockUseSession = useSession as jest.Mock
+  const mockUsePathname = usePathname as jest.Mock
+
   beforeEach(() => {
-    // 重置所有mock
-    jest.clearAllMocks()
-    // 设置默认路径
-    ;(usePathname as jest.Mock).mockReturnValue('/dashboard')
-  })
-
-  it('renders sidebar with basic navigation items', () => {
-    // 模拟未登录状态
-    ;(useSession as jest.Mock).mockReturnValue({
-      data: null,
-      status: 'unauthenticated',
-    })
-
-    render(<Sidebar />)
-
-    // 检查基本导航项
-    const nav = screen.getByRole('navigation')
-    expect(nav).toHaveTextContent('仪表盘')
-    expect(nav).toHaveTextContent('课程')
-    expect(nav).toHaveTextContent('任务')
-  })
-
-  it('shows teacher navigation items for teacher role', () => {
-    ;(useSession as jest.Mock).mockReturnValue({
+    mockUseSession.mockReturnValue({
       data: {
         user: {
-          name: 'Teacher User',
+          role: 'STUDENT',
+        },
+      },
+    })
+    mockUsePathname.mockReturnValue('/dashboard')
+  })
+
+  afterEach(() => {
+    jest.clearAllMocks()
+  })
+
+  it('renders navigation items', () => {
+    const items = defaultItems.slice(0, 3)
+    render(<Sidebar items={items} />)
+    
+    items.forEach(item => {
+      const link = screen.getByRole('link', { name: item.label })
+      expect(link).toBeInTheDocument()
+      expect(link).toHaveAttribute('href', item.href)
+    })
+  })
+
+  it('filters navigation items based on user role', () => {
+    mockUseSession.mockReturnValue({
+      data: {
+        user: {
           role: 'TEACHER',
         },
       },
-      status: 'authenticated',
     })
 
-    render(<Sidebar />)
-
-    const nav = screen.getByRole('navigation')
-    expect(nav).toHaveTextContent('团队')
+    render(<Sidebar items={defaultItems} />)
+    
+    expect(screen.getByText('仪表盘')).toBeInTheDocument()
+    expect(screen.getByText('课程')).toBeInTheDocument()
+    expect(screen.getByText('任务')).toBeInTheDocument()
+    expect(screen.getByText('团队')).toBeInTheDocument()
+    expect(screen.queryByText('管理')).not.toBeInTheDocument()
   })
 
-  it('shows admin navigation items for admin role', () => {
-    ;(useSession as jest.Mock).mockReturnValue({
-      data: {
-        user: {
-          name: 'Admin User',
-          role: 'ADMIN',
-        },
-      },
-      status: 'authenticated',
-    })
-
-    render(<Sidebar />)
-
-    const nav = screen.getByRole('navigation')
-    expect(nav).toHaveTextContent('管理')
-  })
-
-  it('toggles sidebar collapse state when collapse button is clicked', () => {
-    ;(useSession as jest.Mock).mockReturnValue({
-      data: null,
-      status: 'unauthenticated',
-    })
-
-    render(<Sidebar />)
-
-    // 初始状态应该是展开的
-    const nav = screen.getByRole('navigation')
-    expect(nav).toHaveTextContent('仪表盘')
-    expect(nav).toHaveTextContent('课程')
-    expect(nav).toHaveTextContent('任务')
-
-    // 点击折叠按钮
-    const collapseButton = screen.getByRole('button')
-    fireEvent.click(collapseButton)
-
-    // 检查文本是否隐藏
-    expect(nav).not.toHaveTextContent('仪表盘')
-    expect(nav).not.toHaveTextContent('课程')
-    expect(nav).not.toHaveTextContent('任务')
+  it('toggles collapse state when button is clicked', () => {
+    const items = defaultItems.slice(0, 3)
+    render(<Sidebar items={items} />)
+    
+    const toggleButton = screen.getByRole('button')
+    fireEvent.click(toggleButton)
+    
+    expect(screen.queryByText('仪表盘')).not.toBeInTheDocument()
+    expect(screen.queryByText('课程')).not.toBeInTheDocument()
+    expect(screen.queryByText('任务')).not.toBeInTheDocument()
   })
 
   it('highlights active navigation item', () => {
-    ;(useSession as jest.Mock).mockReturnValue({
-      data: null,
-      status: 'unauthenticated',
+    const items = defaultItems.slice(0, 3)
+    render(<Sidebar items={items} />)
+    
+    const activeLink = screen.getByRole('link', { name: '仪表盘' })
+    expect(activeLink).toHaveClass('bg-primary/10', 'text-primary')
+    
+    const inactiveLinks = items
+      .filter(item => item.href !== '/dashboard')
+      .map(item => screen.getByRole('link', { name: item.label }))
+    
+    inactiveLinks.forEach(link => {
+      expect(link).not.toHaveClass('bg-primary/10', 'text-primary')
     })
+  })
 
-    // 设置当前路径为 /courses
-    ;(usePathname as jest.Mock).mockReturnValue('/courses')
+  it('applies custom class names', () => {
+    const items = defaultItems.slice(0, 3)
+    render(<Sidebar className="custom-class" items={items} />)
+    
+    const sidebar = screen.getByRole('navigation').parentElement
+    expect(sidebar).toHaveClass('custom-class')
+  })
 
-    render(<Sidebar />)
-
-    // 检查课程链接是否有高亮样式
-    const coursesLink = screen.getByRole('link', { name: '课程' })
-    expect(coursesLink).toHaveClass('bg-gray-100', 'text-gray-900')
+  it('renders with custom menu items', () => {
+    const customItems = [
+      {
+        href: '/custom',
+        label: '自定义菜单',
+        icon: '🔵',
+      },
+    ]
+    render(<Sidebar items={customItems} />)
+    
+    const customLink = screen.getByRole('link', { name: /自定义菜单/ })
+    expect(customLink).toBeInTheDocument()
+    expect(customLink).toHaveAttribute('href', '/custom')
+    expect(screen.getByText('🔵')).toBeInTheDocument()
+    
+    const standardItems = ['仪表盘', '课程', '任务']
+    standardItems.forEach(label => {
+      expect(screen.queryByText(label)).not.toBeInTheDocument()
+    })
   })
 }) 

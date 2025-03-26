@@ -2,22 +2,28 @@ import { useState } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useSession } from 'next-auth/react'
+import { cn } from '@/lib/utils'
 
 interface SidebarItem {
-  name: string
   href: string
-  icon: React.ReactNode
+  label: string
+  icon?: string | React.ReactNode
   role?: string
 }
 
-export default function Sidebar() {
+interface SidebarProps {
+  items: SidebarItem[]
+  className?: string
+}
+
+export default function Sidebar({ items, className }: SidebarProps) {
   const { data: session } = useSession()
   const pathname = usePathname()
   const [isCollapsed, setIsCollapsed] = useState(false)
 
-  const navigation: SidebarItem[] = [
+  const defaultNavigation: SidebarItem[] = [
     {
-      name: '仪表盘',
+      label: '仪表盘',
       href: '/dashboard',
       icon: (
         <svg
@@ -36,7 +42,7 @@ export default function Sidebar() {
       ),
     },
     {
-      name: '课程',
+      label: '课程',
       href: '/courses',
       icon: (
         <svg
@@ -55,7 +61,7 @@ export default function Sidebar() {
       ),
     },
     {
-      name: '任务',
+      label: '任务',
       href: '/tasks',
       icon: (
         <svg
@@ -74,7 +80,7 @@ export default function Sidebar() {
       ),
     },
     {
-      name: '团队',
+      label: '团队',
       href: '/teams',
       icon: (
         <svg
@@ -94,7 +100,7 @@ export default function Sidebar() {
       role: 'TEACHER',
     },
     {
-      name: '管理',
+      label: '管理',
       href: '/admin',
       icon: (
         <svg
@@ -121,62 +127,56 @@ export default function Sidebar() {
     },
   ]
 
+  const navigation = items || defaultNavigation
+
   const filteredNavigation = navigation.filter(
     (item) => !item.role || session?.user?.role === item.role
   )
 
   return (
-    <div
-      className={`bg-white shadow-lg transition-all duration-300 ${
-        isCollapsed ? 'w-16' : 'w-64'
-      }`}
-    >
-      <div className="flex flex-col h-full">
-        <div className="flex items-center justify-between p-4">
-          {!isCollapsed && (
-            <span className="text-xl font-bold text-gray-800">EduHub</span>
-          )}
-          <button
-            onClick={() => setIsCollapsed(!isCollapsed)}
-            className="p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100"
+    <div className={cn("flex flex-col h-full", className)}>
+      <div className="flex items-center justify-between p-4">
+        {!isCollapsed && (
+          <span className="text-xl font-bold text-gray-800">EduHub</span>
+        )}
+        <button
+          onClick={() => setIsCollapsed(!isCollapsed)}
+          className="p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100"
+        >
+          <svg
+            className="h-6 w-6"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
           >
-            <svg
-              className="h-6 w-6"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d={isCollapsed ? 'M13 5l7 7-7 7M5 5l7 7-7 7' : 'M11 19l-7-7 7-7m8 14l-7-7 7-7'}
-              />
-            </svg>
-          </button>
-        </div>
-        <nav className="flex-1 px-2 py-4 space-y-1">
-          {filteredNavigation.map((item) => {
-            const isActive = pathname === item.href
-            return (
-              <Link
-                key={item.name}
-                href={item.href}
-                className={`flex items-center px-4 py-2 text-sm font-medium rounded-md ${
-                  isActive
-                    ? 'bg-gray-100 text-gray-900'
-                    : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
-                }`}
-              >
-                {item.icon}
-                {!isCollapsed && (
-                  <span className="ml-3">{item.name}</span>
-                )}
-              </Link>
-            )
-          })}
-        </nav>
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M11 19l-7-7 7-7m8 14l-7-7 7-7"
+            />
+          </svg>
+        </button>
       </div>
+      <nav className="space-y-1" role="navigation">
+        {filteredNavigation.map((item) => (
+          <a
+            key={item.href}
+            href={item.href}
+            className={cn(
+              'flex items-center px-4 py-2 text-sm font-medium rounded-md',
+              pathname === item.href
+                ? 'bg-primary/10 text-primary'
+                : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+            )}
+          >
+            {item.icon && <span>{item.icon}</span>}
+            {!isCollapsed && (
+              <span className="ml-3">{item.label}</span>
+            )}
+          </a>
+        ))}
+      </nav>
     </div>
   )
 } 

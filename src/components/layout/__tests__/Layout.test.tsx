@@ -1,36 +1,50 @@
 import { render, screen } from '@testing-library/react'
 import Layout from '../Layout'
+import { SessionProvider } from 'next-auth/react'
+
+// 模拟 next-auth 的 useSession hook
+jest.mock('next-auth/react', () => ({
+  useSession: () => ({
+    data: null,
+    status: 'unauthenticated'
+  }),
+  SessionProvider: ({ children }: { children: React.ReactNode }) => <>{children}</>
+}))
 
 describe('Layout', () => {
   it('renders layout with header, sidebar and main content', () => {
     render(
-      <Layout>
-        <div>Test Content</div>
-      </Layout>
+      <SessionProvider>
+        <Layout>
+          <div>Test Content</div>
+        </Layout>
+      </SessionProvider>
     )
-
-    // 检查是否渲染了所有主要组件
-    expect(screen.getByText('EduHub')).toBeInTheDocument() // Header中的logo
-    expect(screen.getByText('仪表盘')).toBeInTheDocument() // Sidebar中的导航项
-    expect(screen.getByText('Test Content')).toBeInTheDocument() // Main content
+    expect(screen.getByRole('banner')).toBeInTheDocument()
+    expect(screen.getAllByRole('navigation')).toHaveLength(2) // 顶部导航和侧边栏导航
+    expect(screen.getByRole('main')).toBeInTheDocument()
   })
 
   it('renders children in main content area', () => {
-    const testContent = 'Custom Content'
-    render(<Layout>{testContent}</Layout>)
-    expect(screen.getByText(testContent)).toBeInTheDocument()
+    render(
+      <SessionProvider>
+        <Layout>
+          <div>Test Content</div>
+        </Layout>
+      </SessionProvider>
+    )
+    expect(screen.getByText('Test Content')).toBeInTheDocument()
   })
 
   it('applies correct layout structure', () => {
-    render(
-      <Layout>
-        <div>Test Content</div>
-      </Layout>
+    const { container } = render(
+      <SessionProvider>
+        <Layout>
+          <div>Test Content</div>
+        </Layout>
+      </SessionProvider>
     )
-
-    // 检查布局结构
-    expect(screen.getByRole('banner')).toBeInTheDocument() // Header
-    expect(screen.getByRole('navigation')).toBeInTheDocument() // Sidebar
-    expect(screen.getByRole('main')).toBeInTheDocument() // Main content
+    expect(container.firstChild).toHaveClass('min-h-screen')
+    expect(screen.getByRole('main')).toHaveClass('flex-1')
   })
 }) 

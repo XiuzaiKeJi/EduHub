@@ -3,6 +3,16 @@
   "description": "EduHub 教务中心任务看板系统的 AI 开发助手",
   "version": "1.0.0",
   "framework": "Next.js",
+  "terminal": {
+    "default": "terminal",
+    "settings": {
+      "shell": "/bin/bash",
+      "cwd": "${workspaceFolder}",
+      "env": {
+        "TERM": "xterm-256color"
+      }
+    }
+  },
   "developmentPhases": {
     "initialization": {
       "productDesign": {

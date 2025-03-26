@@ -2,9 +2,10 @@ export type UserRole = 'STUDENT' | 'TEACHER' | 'ADMIN'
 
 export interface User {
   id: string
-  email: string
   name: string
+  email: string
   role: UserRole
+  department?: string
   createdAt: Date
   updatedAt: Date
 }
@@ -12,23 +13,25 @@ export interface User {
 export interface Task {
   id: string
   title: string
-  description: string
-  status: 'TODO' | 'IN_PROGRESS' | 'DONE'
-  priority: 'LOW' | 'MEDIUM' | 'HIGH'
-  dueDate: Date
+  description?: string
+  status: string
+  priority: string
+  startDate?: Date
+  dueDate?: Date
   createdAt: Date
   updatedAt: Date
-  userId: string
-  user: User
+  creatorId: string
+  assigneeId: string
+  courseId?: string
 }
 
 export interface Course {
   id: string
   name: string
-  description: string
-  teacherId: string
-  teacher: User
-  students: User[]
+  description?: string
+  startDate: Date
+  endDate: Date
+  status: string
   createdAt: Date
   updatedAt: Date
 }

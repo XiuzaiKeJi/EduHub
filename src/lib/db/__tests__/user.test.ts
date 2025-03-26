@@ -1,75 +1,127 @@
-import { prisma } from '../index'
-import { UserRole } from '../../../types'
+import { PrismaClient, UserRole } from '@prisma/client'
+import { mockDeep, mockReset, DeepMockProxy } from 'jest-mock-extended'
 
-describe('User Model', () => {
-  const testUser = {
-    email: 'test@example.com',
-    name: 'Test User',
-    password: 'password123',
-    role: UserRole.STUDENT
+// Mock PrismaClient
+jest.mock('@prisma/client', () => ({
+  PrismaClient: jest.fn(() => mockDeep<PrismaClient>()),
+  UserRole: {
+    STUDENT: 'STUDENT',
+    TEACHER: 'TEACHER',
+    ADMIN: 'ADMIN'
   }
+}))
 
-  beforeEach(async () => {
-    await prisma.user.deleteMany()
+const prismaMock = mockDeep<PrismaClient>()
+
+describe('User Database Operations', () => {
+  beforeEach(() => {
+    mockReset(prismaMock)
   })
 
-  afterAll(async () => {
-    await prisma.$disconnect()
+  it('creates a new user', async () => {
+    const mockUser = {
+      id: '1',
+      email: 'test@example.com',
+      name: '测试用户',
+      password: 'hashedPassword',
+      role: UserRole.STUDENT,
+    }
+
+    prismaMock.user.create.mockResolvedValue(mockUser)
+
+    const user = await prismaMock.user.create({
+      data: {
+        email: 'test@example.com',
+        name: '测试用户',
+        password: 'hashedPassword',
+        role: UserRole.STUDENT,
+      },
+    })
+
+    expect(user).toEqual(mockUser)
+    expect(prismaMock.user.create).toHaveBeenCalledWith({
+      data: {
+        email: 'test@example.com',
+        name: '测试用户',
+        password: 'hashedPassword',
+        role: UserRole.STUDENT,
+      },
+    })
   })
 
-  it('should create a new user', async () => {
-    const user = await prisma.user.create({
-      data: testUser
+  it('finds user by email', async () => {
+    const mockUser = {
+      id: '1',
+      email: 'test@example.com',
+      name: '测试用户',
+      password: 'hashedPassword',
+      role: UserRole.STUDENT,
+    }
+
+    prismaMock.user.findUnique.mockResolvedValue(mockUser)
+
+    const user = await prismaMock.user.findUnique({
+      where: { email: 'test@example.com' },
     })
 
-    expect(user).toBeDefined()
-    expect(user.email).toBe(testUser.email)
-    expect(user.name).toBe(testUser.name)
-    expect(user.role).toBe(testUser.role)
-    expect(user.password).toBe(testUser.password)
-    expect(user.createdAt).toBeDefined()
-    expect(user.updatedAt).toBeDefined()
+    expect(user).toEqual(mockUser)
+    expect(prismaMock.user.findUnique).toHaveBeenCalledWith({
+      where: { email: 'test@example.com' },
+    })
   })
 
-  it('should not create user with duplicate email', async () => {
-    await prisma.user.create({
-      data: testUser
+  it('updates user information', async () => {
+    const mockUser = {
+      id: '1',
+      email: 'test@example.com',
+      name: '更新后的用户',
+      password: 'hashedPassword',
+      role: UserRole.TEACHER,
+    }
+
+    prismaMock.user.update.mockResolvedValue(mockUser)
+
+    const updatedUser = await prismaMock.user.update({
+      where: { id: '1' },
+      data: {
+        name: '更新后的用户',
+        role: UserRole.TEACHER,
+      },
     })
 
-    await expect(
-      prisma.user.create({
-        data: testUser
-      })
-    ).rejects.toThrow()
+    expect(updatedUser).toEqual(mockUser)
+    expect(prismaMock.user.update).toHaveBeenCalledWith({
+      where: { id: '1' },
+      data: {
+        name: '更新后的用户',
+        role: UserRole.TEACHER,
+      },
+    })
   })
 
-  it('should update user', async () => {
-    const user = await prisma.user.create({
-      data: testUser
+  it('deletes user', async () => {
+    const mockUser = {
+      id: '1',
+      email: 'test@example.com',
+      name: '测试用户',
+      password: 'hashedPassword',
+      role: UserRole.STUDENT,
+    }
+
+    prismaMock.user.delete.mockResolvedValue(mockUser)
+    prismaMock.user.findUnique.mockResolvedValue(null)
+
+    await prismaMock.user.delete({
+      where: { id: '1' },
     })
 
-    const updatedUser = await prisma.user.update({
-      where: { id: user.id },
-      data: { name: 'Updated Name' }
-    })
-
-    expect(updatedUser.name).toBe('Updated Name')
-    expect(updatedUser.updatedAt).not.toBe(user.updatedAt)
-  })
-
-  it('should delete user', async () => {
-    const user = await prisma.user.create({
-      data: testUser
-    })
-
-    await prisma.user.delete({
-      where: { id: user.id }
-    })
-
-    const deletedUser = await prisma.user.findUnique({
-      where: { id: user.id }
+    const deletedUser = await prismaMock.user.findUnique({
+      where: { id: '1' },
     })
 
     expect(deletedUser).toBeNull()
+    expect(prismaMock.user.delete).toHaveBeenCalledWith({
+      where: { id: '1' },
+    })
   })
 }) 

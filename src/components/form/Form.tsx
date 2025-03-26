@@ -3,30 +3,39 @@ import { useFormContext, UseFormReturn, FormProvider } from 'react-hook-form';
 
 interface FormProps extends React.FormHTMLAttributes<HTMLFormElement> {
   form: UseFormReturn<any>;
-  children: React.ReactNode;
+  children: React.ReactNode | ((props: { isSubmitting: boolean }) => React.ReactNode);
+  onSubmit?: (data: any) => Promise<void> | void;
 }
 
-export const Form = ({ form, children, className, ...props }: FormProps) => {
+export const Form = React.forwardRef<HTMLFormElement, FormProps>(({ form, children, className, onSubmit, ...props }, ref) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    setIsSubmitting(true);
-    try {
-      await form.handleSubmit(props.onSubmit)(event);
-    } finally {
-      setIsSubmitting(false);
+    if (onSubmit) {
+      try {
+        setIsSubmitting(true);
+        const isValid = await form.trigger();
+        if (isValid) {
+          const data = form.getValues();
+          await onSubmit(data);
+        }
+      } finally {
+        setIsSubmitting(false);
+      }
     }
   };
 
   return (
     <FormProvider {...form}>
-      <form onSubmit={handleSubmit} className={className}>
+      <form onSubmit={handleSubmit} className={className} role="form" ref={ref} {...props}>
         {typeof children === 'function' ? children({ isSubmitting }) : children}
       </form>
     </FormProvider>
   );
-};
+});
+
+Form.displayName = 'Form';
 
 interface FormFieldProps<T extends Record<string, any>> {
   name: keyof T;

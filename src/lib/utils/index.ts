@@ -8,7 +8,7 @@ export function formatDate(date: Date) {
   }).format(date)
 }
 
-export function classNames(...classes: string[]) {
+export function cn(...classes: string[]) {
   return classes.filter(Boolean).join(' ')
 }
 

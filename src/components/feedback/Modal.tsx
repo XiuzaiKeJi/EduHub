@@ -1,7 +1,7 @@
 import React from 'react';
 import { Dialog, Transition } from '@headlessui/react';
 import { Fragment } from 'react';
-import Button from '../form/Button';
+import { Button } from '../form/Button';
 
 interface ModalProps {
   isOpen: boolean;

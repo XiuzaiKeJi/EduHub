@@ -4,6 +4,118 @@ import { loadEnvConfig } from '@next/env'
 // 加载环境变量
 loadEnvConfig(process.cwd())
 
+// 模拟 Headers 对象
+global.Headers = class Headers {
+  #headers = new Map()
+
+  constructor(init = {}) {
+    if (init instanceof Headers) {
+      init.forEach((value, key) => this.#headers.set(key.toLowerCase(), value))
+    } else if (typeof init === 'object') {
+      Object.entries(init).forEach(([key, value]) => {
+        this.#headers.set(key.toLowerCase(), value)
+      })
+    }
+  }
+
+  append(name, value) {
+    const key = name.toLowerCase()
+    const current = this.#headers.get(key)
+    this.#headers.set(key, current ? `${current}, ${value}` : value)
+  }
+
+  delete(name) {
+    this.#headers.delete(name.toLowerCase())
+  }
+
+  get(name) {
+    return this.#headers.get(name.toLowerCase()) || null
+  }
+
+  has(name) {
+    return this.#headers.has(name.toLowerCase())
+  }
+
+  set(name, value) {
+    this.#headers.set(name.toLowerCase(), value)
+  }
+
+  forEach(callback) {
+    this.#headers.forEach((value, key) => callback(value, key, this))
+  }
+
+  entries() {
+    return this.#headers.entries()
+  }
+
+  keys() {
+    return this.#headers.keys()
+  }
+
+  values() {
+    return this.#headers.values()
+  }
+}
+
+// 模拟 Request 和 Response 对象
+global.Request = class Request {
+  #url;
+  #options;
+  #headers;
+  #cookies;
+
+  constructor(url, options = {}) {
+    this.#url = url instanceof URL ? url : new URL(url);
+    this.#options = options;
+    this.#headers = new Headers(options.headers);
+    this.#cookies = new Map();
+  }
+
+  get url() {
+    return this.#url.toString();
+  }
+
+  get headers() {
+    return this.#headers;
+  }
+
+  get cookies() {
+    return {
+      get: (key) => this.#cookies.get(key),
+      getAll: () => Object.fromEntries(this.#cookies),
+      set: (key, value) => this.#cookies.set(key, value),
+      delete: (key) => this.#cookies.delete(key),
+    };
+  }
+}
+
+global.Response = class Response {
+  constructor(body, init) {
+    this.body = body
+    this.status = init?.status || 200
+    this.statusText = init?.statusText || ''
+    this.headers = new Headers(init?.headers)
+  }
+}
+
+// 模拟 Prisma Client
+jest.mock('@prisma/client', () => ({
+  PrismaClient: jest.fn().mockImplementation(() => ({
+    user: {
+      create: jest.fn(),
+      findUnique: jest.fn(),
+      update: jest.fn(),
+      delete: jest.fn(),
+      deleteMany: jest.fn(),
+    },
+  })),
+  UserRole: {
+    STUDENT: 'STUDENT',
+    TEACHER: 'TEACHER',
+    ADMIN: 'ADMIN',
+  },
+}))
+
 // Mock fetch
 global.fetch = jest.fn((url, options) => {
   const { method, headers, body } = options || {}

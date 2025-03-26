@@ -1,89 +1,122 @@
-import { NextRequest } from 'next/server'
-import middleware from './middleware'
-import { UserRole } from './types'
+import { NextRequest, NextResponse } from 'next/server'
+import { middleware } from './middleware'
+import { encode } from 'next-auth/jwt'
 
-// 模拟NextAuth token
-const mockToken = (role: UserRole | null = null) => ({
-  nextauth: {
-    token: role ? {
-      name: 'Test User',
-      email: 'test@example.com',
-      role: role,
-      sub: '1',
-      iat: Math.floor(Date.now() / 1000),
-      exp: Math.floor(Date.now() / 1000) + (24 * 60 * 60), // 24 hours
-      jti: 'test-jwt-id'
-    } : null
+// Mock NextResponse
+jest.mock('next/server', () => {
+  const actual = jest.requireActual('next/server')
+  return {
+    ...actual,
+    NextResponse: {
+      ...actual.NextResponse,
+      redirect: jest.fn().mockImplementation((url) => {
+        const headers = new Headers()
+        headers.set('location', url.pathname)
+        return {
+          status: 302,
+          headers
+        }
+      }),
+      next: jest.fn().mockImplementation(() => {
+        const headers = new Headers()
+        return {
+          status: 200,
+          headers
+        }
+      })
+    }
   }
 })
 
-// 模拟请求
-const createRequest = (path: string, token: any = null) => {
-  const req = new NextRequest(new URL(`http://localhost:3000${path}`))
-  // @ts-ignore - 添加模拟的nextauth属性
-  req.nextauth = token?.nextauth
-  return req
+// Mock next-auth/jwt
+jest.mock('next-auth/jwt', () => ({
+  encode: jest.fn(),
+  decode: jest.fn(),
+  getToken: jest.fn()
+}))
+
+type UserRole = 'STUDENT' | 'TEACHER' | 'ADMIN'
+
+// 模拟 NextAuth 的 token
+const mockToken = async (role: UserRole) => {
+  const token = {
+    name: '测试用户',
+    email: 'test@example.com',
+    role,
+  }
+  return `${role}.${JSON.stringify(token)}`
 }
 
-describe('Auth Middleware', () => {
-  describe('Authentication', () => {
-    it('should redirect to login page when user is not authenticated', async () => {
-      const req = createRequest('/dashboard')
-      const res = await middleware(req)
-      
-      expect(res?.status).toBe(307) // 临时重定向
-      expect(res?.headers.get('location')).toBe('http://localhost:3000/auth/login?callbackUrl=%2Fdashboard')
-    })
+// 创建模拟请求
+const createMockRequest = async (path: string, role?: UserRole) => {
+  const headers = new Headers()
+  if (role) {
+    const token = await mockToken(role)
+    headers.set('Authorization', `Bearer ${token}`)
+  }
+  return new NextRequest(new URL(path, 'http://localhost'), {
+    headers,
+  })
+}
 
-    it('should allow access to authenticated user with correct role', async () => {
-      const req = createRequest('/dashboard', mockToken('STUDENT'))
-      const res = await middleware(req)
-      
-      expect(res?.status).toBe(307) // NextAuth总是返回307
-      expect(res?.headers.get('location')).toBe('http://localhost:3000/auth/login?callbackUrl=%2Fdashboard')
-    })
+describe('Middleware', () => {
+  beforeAll(() => {
+    process.env.NODE_ENV = 'test'
+    process.env.NEXTAUTH_SECRET = 'test-secret'
   })
 
-  describe('Role-based Access Control', () => {
-    it('should allow student to access allowed routes', async () => {
-      const req = createRequest('/courses', mockToken('STUDENT'))
-      const res = await middleware(req)
-      
-      expect(res?.status).toBe(307)
-      expect(res?.headers.get('location')).toBe('http://localhost:3000/auth/login?callbackUrl=%2Fcourses')
-    })
+  afterAll(() => {
+    process.env.NODE_ENV = 'development'
+    delete process.env.NEXTAUTH_SECRET
+  })
 
-    it('should deny student access to teacher routes', async () => {
-      const req = createRequest('/teams', mockToken('STUDENT'))
-      const res = await middleware(req)
-      
-      expect(res?.status).toBe(307)
-      expect(res?.headers.get('location')).toBe('http://localhost:3000/auth/login?callbackUrl=%2Fteams')
-    })
+  it('redirects to login page when not authenticated', async () => {
+    const request = await createMockRequest('/dashboard')
+    const response = await middleware(request)
+    expect(response.status).toBe(302)
+    expect(response.headers.get('location')).toBe('/login')
+  })
 
-    it('should allow teacher to access all routes except admin', async () => {
-      const req = createRequest('/teams', mockToken('TEACHER'))
-      const res = await middleware(req)
-      
-      expect(res?.status).toBe(307)
-      expect(res?.headers.get('location')).toBe('http://localhost:3000/auth/login?callbackUrl=%2Fteams')
+  it('allows access to public routes', async () => {
+    const request = await createMockRequest('/login')
+    const response = await middleware(request)
+    expect(response.status).toBe(200)
+  })
 
-      const adminReq = createRequest('/admin', mockToken('TEACHER'))
-      const adminRes = await middleware(adminReq)
-      
-      expect(adminRes?.status).toBe(307)
-      expect(adminRes?.headers.get('location')).toBe('http://localhost:3000/auth/login?callbackUrl=%2Fadmin')
-    })
+  it('allows student access to student routes', async () => {
+    const request = await createMockRequest('/dashboard', 'STUDENT')
+    const response = await middleware(request)
+    expect(response.status).toBe(200)
+  })
 
-    it('should allow admin to access all routes', async () => {
-      const routes = ['/dashboard', '/courses', '/tasks', '/teams', '/admin']
-      
-      for (const route of routes) {
-        const req = createRequest(route, mockToken('ADMIN'))
-        const res = await middleware(req)
-        expect(res?.status).toBe(307)
-        expect(res?.headers.get('location')).toBe(`http://localhost:3000/auth/login?callbackUrl=%2F${route.slice(1)}`)
-      }
-    })
+  it('allows teacher access to teacher routes', async () => {
+    const request = await createMockRequest('/teams', 'TEACHER')
+    const response = await middleware(request)
+    expect(response.status).toBe(200)
+  })
+
+  it('allows admin access to admin routes', async () => {
+    const request = await createMockRequest('/admin', 'ADMIN')
+    const response = await middleware(request)
+    expect(response.status).toBe(200)
+  })
+
+  it('redirects to login page when accessing unauthorized routes', async () => {
+    const request = await createMockRequest('/admin', 'STUDENT')
+    const response = await middleware(request)
+    expect(response.status).toBe(302)
+    expect(response.headers.get('location')).toBe('/login')
+  })
+
+  it('handles API routes correctly', async () => {
+    const request = await createMockRequest('/api/auth/session')
+    const response = await middleware(request)
+    expect(response.status).toBe(200)
+  })
+
+  it('handles static files correctly', async () => {
+    const request = await createMockRequest('/_next/static/test.js')
+    const response = await middleware(request)
+    expect(response.status).toBe(200)
   })
 }) 
