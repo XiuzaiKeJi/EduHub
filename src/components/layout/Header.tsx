@@ -1,10 +1,12 @@
+'use client';
+
 import { useState } from 'react'
 import Link from 'next/link'
 import { useSession } from 'next-auth/react'
 
 type UserRole = 'STUDENT' | 'TEACHER' | 'ADMIN'
 
-export default function Header() {
+export function Header() {
   const { data: session } = useSession()
   const [isMenuOpen, setIsMenuOpen] = useState(false)
 

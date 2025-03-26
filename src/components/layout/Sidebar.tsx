@@ -1,3 +1,5 @@
+'use client';
+
 import { useState } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
@@ -12,11 +14,11 @@ interface SidebarItem {
 }
 
 interface SidebarProps {
-  items: SidebarItem[]
+  items?: SidebarItem[]
   className?: string
 }
 
-export default function Sidebar({ items, className }: SidebarProps) {
+export function Sidebar({ items, className }: SidebarProps) {
   const { data: session } = useSession()
   const pathname = usePathname()
   const [isCollapsed, setIsCollapsed] = useState(false)

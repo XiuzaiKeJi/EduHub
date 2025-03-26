@@ -1,12 +1,14 @@
+'use client';
+
 import { ReactNode } from 'react'
-import Header from './Header'
-import Sidebar from './Sidebar'
+import { Header } from './Header'
+import { Sidebar } from './Sidebar'
 
 interface LayoutProps {
   children: ReactNode
 }
 
-export default function Layout({ children }: LayoutProps) {
+export function Layout({ children }: LayoutProps) {
   return (
     <div className="min-h-screen bg-gray-100">
       <Header />
