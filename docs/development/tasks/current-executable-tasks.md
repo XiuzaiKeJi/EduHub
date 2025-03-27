@@ -66,7 +66,7 @@
   - 状态：已完成
   - 完成说明：实现了课程时间表的创建、读取、更新和删除API接口。创建了src/app/api/courses/[id]/schedules/route.ts文件用于获取课程时间表列表和创建课程时间表，以及src/app/api/courses/[id]/schedules/[scheduleId]/route.ts文件用于获取、更新和删除单个课程时间表。接口包含了适当的错误处理、权限验证和数据验证。在创建和更新操作中，添加了检查时间冲突的逻辑，确保同一教师在同一时间段内不会被安排多个课程。
 
-- [ ] 课程资源CRUD接口
+- [x] 课程资源CRUD接口
   - 任务描述：实现课程资源创建、读取、更新、删除API接口
   - 相关文件：src/app/api/courses/[id]/resources/route.ts, src/app/api/courses/[id]/resources/[resourceId]/route.ts
   - 具体实现：创建RESTful API，支持课程资源的CRUD操作
@@ -86,7 +86,7 @@
 ## 依赖关系
 
 1. ~~首先完成数据模型设计：课程模型 -> 课程分类模型 -> 课程时间表模型 -> 课程资源模型~~ （已完成）
-2. 然后开发API接口：~~课程CRUD接口~~ -> ~~课程分类CRUD接口~~ -> 课程时间表CRUD接口 -> 课程资源CRUD接口
+2. ~~然后开发API接口：课程CRUD接口 -> 课程分类CRUD接口 -> 课程时间表CRUD接口 -> 课程资源CRUD接口~~ （已完成）
 3. 完成基本组件开发：课程列表组件 -> 课程表单组件 -> 课程详情组件
 4. 教师管理功能：教师模型 -> 教师API -> 教师组件
 
