@@ -58,11 +58,13 @@
   - 状态：已完成
   - 完成说明：实现了课程分类的创建、读取、更新和删除API接口。创建了src/app/api/course-categories/route.ts文件用于获取课程分类列表和创建课程分类，以及src/app/api/course-categories/[id]/route.ts文件用于获取、更新和删除单个课程分类。接口提供了搜索、筛选功能，并包含适当的错误处理和权限验证。在更新操作中，添加了防止循环引用的逻辑，在删除操作中添加了检查是否有关联课程或子分类的逻辑。
 
-- [ ] 课程时间表CRUD接口
+- [x] 课程时间表CRUD接口
   - 任务描述：实现课程时间表创建、读取、更新、删除API接口
-  - 相关文件：src/app/api/courses/[id]/schedules/route.ts
+  - 相关文件：src/app/api/courses/[id]/schedules/route.ts, src/app/api/courses/[id]/schedules/[scheduleId]/route.ts
   - 具体实现：创建RESTful API，支持课程时间表的CRUD操作
   - 优先级：中
+  - 状态：已完成
+  - 完成说明：实现了课程时间表的创建、读取、更新和删除API接口。创建了src/app/api/courses/[id]/schedules/route.ts文件用于获取课程时间表列表和创建课程时间表，以及src/app/api/courses/[id]/schedules/[scheduleId]/route.ts文件用于获取、更新和删除单个课程时间表。接口包含了适当的错误处理、权限验证和数据验证。在创建和更新操作中，添加了检查时间冲突的逻辑，确保同一教师在同一时间段内不会被安排多个课程。
 
 - [ ] 课程资源CRUD接口
   - 任务描述：实现课程资源创建、读取、更新、删除API接口
