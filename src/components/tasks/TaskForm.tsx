@@ -53,13 +53,17 @@ export default function TaskForm({ task, onSubmit, onCancel }: TaskFormProps) {
   return (
     <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-4">
       <div>
-        <label className="block text-sm font-medium text-gray-700">
+        <label
+          htmlFor="title"
+          className="block text-sm font-medium text-gray-700"
+        >
           标题
         </label>
         <input
+          id="title"
           type="text"
-          {...register('title')}
           className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+          {...register('title')}
         />
         {errors.title && (
           <p className="mt-1 text-sm text-red-600">{errors.title.message}</p>
@@ -67,35 +71,39 @@ export default function TaskForm({ task, onSubmit, onCancel }: TaskFormProps) {
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-gray-700">
+        <label
+          htmlFor="description"
+          className="block text-sm font-medium text-gray-700"
+        >
           描述
         </label>
         <textarea
-          {...register('description')}
+          id="description"
           rows={3}
           className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+          {...register('description')}
         />
         {errors.description && (
-          <p className="mt-1 text-sm text-red-600">
-            {errors.description.message}
-          </p>
+          <p className="mt-1 text-sm text-red-600">{errors.description.message}</p>
         )}
       </div>
 
       <div className="grid grid-cols-2 gap-4">
         <div>
-          <label className="block text-sm font-medium text-gray-700">
+          <label
+            htmlFor="status"
+            className="block text-sm font-medium text-gray-700"
+          >
             状态
           </label>
           <select
-            {...register('status')}
+            id="status"
             className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+            {...register('status')}
           >
-            {Object.values(TaskStatus).map((status) => (
-              <option key={status} value={status}>
-                {status}
-              </option>
-            ))}
+            <option value="TODO">TODO</option>
+            <option value="IN_PROGRESS">IN_PROGRESS</option>
+            <option value="DONE">DONE</option>
           </select>
           {errors.status && (
             <p className="mt-1 text-sm text-red-600">{errors.status.message}</p>
@@ -103,35 +111,39 @@ export default function TaskForm({ task, onSubmit, onCancel }: TaskFormProps) {
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700">
+          <label
+            htmlFor="priority"
+            className="block text-sm font-medium text-gray-700"
+          >
             优先级
           </label>
           <select
-            {...register('priority')}
+            id="priority"
             className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+            {...register('priority')}
           >
-            {Object.values(TaskPriority).map((priority) => (
-              <option key={priority} value={priority}>
-                {priority}
-              </option>
-            ))}
+            <option value="LOW">LOW</option>
+            <option value="MEDIUM">MEDIUM</option>
+            <option value="HIGH">HIGH</option>
           </select>
           {errors.priority && (
-            <p className="mt-1 text-sm text-red-600">
-              {errors.priority.message}
-            </p>
+            <p className="mt-1 text-sm text-red-600">{errors.priority.message}</p>
           )}
         </div>
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-gray-700">
+        <label
+          htmlFor="dueDate"
+          className="block text-sm font-medium text-gray-700"
+        >
           截止日期
         </label>
         <input
+          id="dueDate"
           type="date"
-          {...register('dueDate')}
           className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+          {...register('dueDate')}
         />
         {errors.dueDate && (
           <p className="mt-1 text-sm text-red-600">{errors.dueDate.message}</p>

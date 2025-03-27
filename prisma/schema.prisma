@@ -10,13 +10,6 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// 用户角色枚举
-enum UserRole {
-  STUDENT
-  TEACHER
-  ADMIN
-}
-
 // 用户模型
 model User {
   id            String    @id @default(cuid())
@@ -34,6 +27,8 @@ model User {
   systemLogs    SystemLog[]
   backups       Backup[]
   importExports ImportExport[]
+  teachingCourses Course[] @relation("CourseTeacher")
+  teachingSchedules CourseSchedule[] @relation("ScheduleTeacher")
 }
 
 // 任务模型
@@ -49,7 +44,7 @@ model Task {
   updatedAt   DateTime  @updatedAt
   createdBy   User      @relation("TaskCreator", fields: [creatorId], references: [id])
   creatorId   String
-  assignedTo  User      @relation("TaskAssignee", fields: [assigneeId], references: [id])
+  assignedTo  User?     @relation("TaskAssignee", fields: [assigneeId], references: [id])
   assigneeId  String?
   course      Course?   @relation(fields: [courseId], references: [id])
   courseId    String?
@@ -111,17 +106,98 @@ model Notification {
   userId    String
 }
 
-// 课程模型
+// 课程分类模型
+model CourseCategory {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  parentId    String?
+  parent      CourseCategory?  @relation("CategoryHierarchy", fields: [parentId], references: [id])
+  children    CourseCategory[] @relation("CategoryHierarchy")
+  courses     Course[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([parentId])
+}
+
+// 课程时间表模型
+model CourseSchedule {
+  id          String   @id @default(cuid())
+  courseId    String
+  course      Course   @relation(fields: [courseId], references: [id])
+  dayOfWeek   Int      // 1-7 表示周一到周日
+  startTime   String   // 格式：HH:mm
+  endTime     String   // 格式：HH:mm
+  location    String?
+  room        String?
+  teacherId   String
+  teacher     User     @relation("ScheduleTeacher", fields: [teacherId], references: [id])
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([courseId])
+  @@index([teacherId])
+}
+
+// 课程资源模型
+model CourseResource {
+  id          String   @id @default(cuid())
+  courseId    String
+  course      Course   @relation(fields: [courseId], references: [id])
+  title       String
+  description String?
+  type        String   // 文档、视频、作业等
+  url         String
+  size        Int?
+  format      String?
+  order       Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([courseId])
+}
+
+// 课程文件模型
+model CourseFile {
+  id        String   @id @default(cuid())
+  name      String
+  type      String
+  size      Int
+  url       String
+  courseId  String
+  course    Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([courseId])
+}
+
+// 更新课程模型
 model Course {
   id          String   @id @default(cuid())
   name        String
   description String?
+  code        String   @unique // 课程代码
+  categoryId  String
+  category    CourseCategory @relation(fields: [categoryId], references: [id])
   startDate   DateTime
   endDate     DateTime
   status      String    @default("PLANNED")
+  maxStudents Int?      // 最大学生数
+  currentStudents Int?  // 当前学生数
+  teacherId   String
+  teacher     User     @relation("CourseTeacher", fields: [teacherId], references: [id])
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   tasks       Task[]
+  schedules   CourseSchedule[]
+  resources   CourseResource[]
+  files       CourseFile[]
+
+  @@index([categoryId])
+  @@index([teacherId])
+  @@index([status])
 }
 
 // 任务依赖关系模型

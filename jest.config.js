@@ -9,17 +9,30 @@ const customJestConfig = {
   testEnvironment: 'jest-environment-jsdom',
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/src/$1',
-    '^react-google-recaptcha$': '<rootDir>/src/__mocks__/react-google-recaptcha.js',
   },
-  testPathIgnorePatterns: ['/node_modules/', '/.next/'],
-  moduleDirectories: ['node_modules', '<rootDir>'],
-  testMatch: ['**/__tests__/**/*.test.[jt]s?(x)', '**/?(*.)+(spec|test).[jt]s?(x)'],
-  transformIgnorePatterns: [
-    '/node_modules/(?!(jose|@panva/hkdf|cookie|next-auth|@babel/runtime/helpers/esm|@swc/helpers|@panva/hkdf))',
+  testMatch: [
+    '**/tests/**/*.test.ts?(x)',
+    '**/src/**/*.test.ts?(x)'
   ],
-  transform: {
-    '^.+\\.(js|jsx|ts|tsx|mjs)$': ['babel-jest', { presets: ['next/babel'] }],
+  collectCoverageFrom: [
+    'src/lib/api/**/*.{js,jsx,ts,tsx}',
+    '!src/lib/api/**/*.d.ts',
+    '!src/lib/api/**/*.test.{js,jsx,ts,tsx}',
+  ],
+  coverageThreshold: {
+    global: {
+      branches: 100,
+      functions: 100,
+      lines: 100,
+      statements: 100,
+    },
   },
+  transform: {
+    '^.+\\.(ts|tsx)$': ['babel-jest', { presets: ['next/babel'] }],
+  },
+  transformIgnorePatterns: [
+    '/node_modules/(?!(jose|@panva|oidc-token-hash|next-auth|@babel/runtime/helpers/esm|@swc/helpers))',
+  ],
 }
 
 module.exports = createJestConfig(customJestConfig) 

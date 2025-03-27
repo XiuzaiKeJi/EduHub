@@ -64,10 +64,9 @@ export const Modal: React.FC<ModalProps> = ({
                 <div className="mt-2">
                   {children}
                 </div>
-
                 <div className="mt-4 flex justify-end space-x-3">
                   <Button
-                    variant="secondary"
+                    variant="outline"
                     onClick={onClose}
                     disabled={loading}
                   >
@@ -76,8 +75,8 @@ export const Modal: React.FC<ModalProps> = ({
                   {onConfirm && (
                     <Button
                       onClick={onConfirm}
-                      isLoading={loading}
                       disabled={loading}
+                      isLoading={loading}
                     >
                       {confirmText}
                     </Button>

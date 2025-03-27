@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor, fireEvent } from '@testing-library/react';
 import { TaskDetail } from '../TaskDetail';
 import { getTaskById } from '@/lib/api/task';
 
@@ -45,11 +45,12 @@ describe('TaskDetail', () => {
   });
 
   it('显示错误信息当加载失败时', async () => {
-    (getTaskById as jest.Mock).mockRejectedValue(new Error('获取任务详情失败'));
+    const errorMessage = '获取任务详情失败: 数据库连接失败';
+    (getTaskById as jest.Mock).mockRejectedValue(new Error(errorMessage));
     render(<TaskDetail taskId="1" />);
 
     await waitFor(() => {
-      expect(screen.getByText('获取任务详情失败')).toBeInTheDocument();
+      expect(screen.getByText(errorMessage)).toBeInTheDocument();
     });
   });
 
@@ -60,5 +61,30 @@ describe('TaskDetail', () => {
     await waitFor(() => {
       expect(screen.getByText('未找到任务')).toBeInTheDocument();
     });
+  });
+
+  it('点击重试按钮时重新加载任务', async () => {
+    const errorMessage = '获取任务详情失败';
+    (getTaskById as jest.Mock)
+      .mockRejectedValueOnce(new Error(errorMessage))
+      .mockResolvedValueOnce(mockTask);
+
+    render(<TaskDetail taskId="1" />);
+
+    await waitFor(() => {
+      expect(screen.getByText(errorMessage)).toBeInTheDocument();
+    });
+
+    const retryButton = screen.getByRole('button', { name: /重试/i });
+    fireEvent.click(retryButton);
+
+    await waitFor(() => {
+      expect(screen.getByText('测试任务')).toBeInTheDocument();
+    });
+  });
+
+  it('当taskId为空时不加载任务', () => {
+    render(<TaskDetail taskId="" />);
+    expect(getTaskById).not.toHaveBeenCalled();
   });
 }); 

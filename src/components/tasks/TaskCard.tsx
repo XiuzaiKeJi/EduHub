@@ -20,7 +20,7 @@ const priorityColors = {
   [TaskPriority.HIGH]: 'bg-red-100 text-red-800',
 }
 
-export default function TaskCard({ task, onUpdate, onDelete }: TaskCardProps) {
+export function TaskCard({ task, onUpdate, onDelete }: TaskCardProps) {
   const handleStatusChange = async (newStatus: TaskStatus) => {
     await onUpdate(task.id, { status: newStatus })
   }
@@ -38,6 +38,7 @@ export default function TaskCard({ task, onUpdate, onDelete }: TaskCardProps) {
             value={task.status}
             onChange={(e) => handleStatusChange(e.target.value as TaskStatus)}
             className={`px-2 py-1 rounded text-sm ${statusColors[task.status]}`}
+            aria-label="状态"
           >
             {Object.values(TaskStatus).map((status) => (
               <option key={status} value={status}>
@@ -49,6 +50,7 @@ export default function TaskCard({ task, onUpdate, onDelete }: TaskCardProps) {
             value={task.priority}
             onChange={(e) => handlePriorityChange(e.target.value as TaskPriority)}
             className={`px-2 py-1 rounded text-sm ${priorityColors[task.priority]}`}
+            aria-label="优先级"
           >
             {Object.values(TaskPriority).map((priority) => (
               <option key={priority} value={priority}>

@@ -1,9 +1,14 @@
-import { getTaskById } from '../task';
+import { getTaskById, updateTask } from '../task';
 import { prisma } from '@/lib/db';
+import { createTestResponse, resetMocks } from './test-utils';
 
 jest.mock('@/lib/db', () => ({
   prisma: {
     task: {
+      findUnique: jest.fn(),
+      update: jest.fn(),
+    },
+    user: {
       findUnique: jest.fn(),
     },
   },
@@ -26,7 +31,7 @@ describe('Task API', () => {
   };
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    resetMocks();
   });
 
   describe('getTaskById', () => {
@@ -73,22 +78,73 @@ describe('Task API', () => {
       });
     });
 
-    it('throws error when database query fails', async () => {
-      const error = new Error('Database error');
-      (prisma.task.findUnique as jest.Mock).mockRejectedValue(error);
+    it('throws error when taskId is empty', async () => {
+      await expect(getTaskById('')).rejects.toThrow('任务ID不能为空');
+    });
 
-      await expect(getTaskById('1')).rejects.toThrow('获取任务详情失败');
-      expect(prisma.task.findUnique).toHaveBeenCalledWith({
-        where: { id: '1' },
-        include: {
-          assignee: {
-            select: {
-              id: true,
-              name: true,
-            },
-          },
-        },
+    it('throws error with detailed message when database error occurs', async () => {
+      const dbError = new Error('数据库连接失败');
+      (prisma.task.findUnique as jest.Mock).mockRejectedValue(dbError);
+
+      await expect(getTaskById('1')).rejects.toThrow('获取任务详情失败: 数据库连接失败');
+    });
+  });
+
+  describe('updateTask', () => {
+    const updateInput = {
+      title: '更新后的任务',
+      description: '更新后的描述',
+      status: 'DONE' as const,
+      priority: 'LOW' as const,
+      dueDate: '2024-03-29T00:00:00Z',
+      assigneeId: '2',
+    };
+
+    it('成功更新任务', async () => {
+      const updatedTask = {
+        ...mockTask,
+        ...updateInput,
+        dueDate: new Date(updateInput.dueDate),
+        updatedAt: new Date(),
+      };
+
+      (prisma.task.findUnique as jest.Mock).mockResolvedValueOnce(mockTask);
+      (prisma.user.findUnique as jest.Mock).mockResolvedValueOnce({ id: '2', name: '新用户' });
+      (prisma.task.update as jest.Mock).mockResolvedValueOnce(updatedTask);
+
+      const result = await updateTask('1', updateInput);
+
+      expect(result).toEqual({
+        ...updatedTask,
+        dueDate: updatedTask.dueDate.toISOString(),
+        createdAt: updatedTask.createdAt.toISOString(),
+        updatedAt: updatedTask.updatedAt.toISOString(),
       });
+    });
+
+    it('当任务不存在时抛出错误', async () => {
+      (prisma.task.findUnique as jest.Mock).mockResolvedValueOnce(null);
+
+      await expect(updateTask('999', updateInput)).rejects.toThrow('更新任务失败: 任务不存在');
+    });
+
+    it('当指定的用户不存在时抛出错误', async () => {
+      (prisma.task.findUnique as jest.Mock).mockResolvedValueOnce(mockTask);
+      (prisma.user.findUnique as jest.Mock).mockResolvedValueOnce(null);
+
+      await expect(updateTask('1', updateInput)).rejects.toThrow('更新任务失败: 指定的用户不存在');
+    });
+
+    it('当taskId为空时抛出错误', async () => {
+      await expect(updateTask('', updateInput)).rejects.toThrow('任务ID不能为空');
+    });
+
+    it('当数据库更新失败时抛出错误', async () => {
+      (prisma.task.findUnique as jest.Mock).mockResolvedValueOnce(mockTask);
+      (prisma.user.findUnique as jest.Mock).mockResolvedValueOnce({ id: '2', name: '新用户' });
+      (prisma.task.update as jest.Mock).mockRejectedValueOnce(new Error('数据库错误'));
+
+      await expect(updateTask('1', updateInput)).rejects.toThrow('更新任务失败: 数据库错误');
     });
   });
 }); 

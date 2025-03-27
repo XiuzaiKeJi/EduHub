@@ -8,7 +8,7 @@ import ReCAPTCHA from 'react-google-recaptcha';
 import { Form } from '@/components/form/Form';
 import { Input } from '@/components/form/Input';
 import { Button } from '@/components/form/Button';
-import Card from '@/components/display/Card';
+import { Card } from '@/components/display/Card';
 import { validatePassword, checkLoginAttempt, updateLoginAttempt, formatRemainingTime, verifyReCaptcha } from './utils';
 
 interface LoginFormData {
@@ -23,7 +23,7 @@ export default function LoginPage() {
   const router = useRouter();
   const recaptchaRef = useRef<ReCAPTCHA>(null);
   
-  const form = useForm<LoginFormData>({
+  const { register, handleSubmit, formState: { errors } } = useForm<LoginFormData>({
     defaultValues: {
       email: '',
       password: '',
@@ -33,12 +33,6 @@ export default function LoginPage() {
 
   const onSubmit = async (data: LoginFormData) => {
     try {
-      // 提交前进行表单验证
-      const isValid = await form.trigger();
-      if (!isValid) {
-        return;
-      }
-
       setIsLoading(true);
       setError(null);
 
@@ -49,149 +43,93 @@ export default function LoginPage() {
         return;
       }
 
-      // 验证reCAPTCHA
+      // 验证 reCAPTCHA
       if (!recaptchaToken) {
         setError('请完成人机验证');
         return;
       }
 
-      const captchaResult = await verifyReCaptcha(recaptchaToken);
-      if (!captchaResult.success) {
-        setError(captchaResult.error);
-        recaptchaRef.current?.reset();
+      const isValidRecaptcha = await verifyReCaptcha(recaptchaToken);
+      if (!isValidRecaptcha) {
+        setError('人机验证失败，请重试');
         return;
       }
 
-      // 验证密码强度
-      const passwordStrength = validatePassword(data.password);
-      if (!passwordStrength.isValid) {
-        setError(passwordStrength.feedback.join('，'));
-        return;
-      }
-
+      // 尝试登录
       const result = await signIn('credentials', {
-        ...data,
         redirect: false,
+        email: data.email,
+        password: data.password,
       });
 
-      // 更新登录尝试记录
-      updateLoginAttempt(data.email, result?.ok || false);
-
-      if (result?.ok) {
-        router.push('/dashboard');
-      } else {
-        setError(result?.error || '邮箱地址或密码错误');
-        recaptchaRef.current?.reset();
+      if (result?.error) {
+        setError('邮箱或密码错误');
+        updateLoginAttempt(data.email);
+        return;
       }
+
+      // 登录成功，更新登录尝试记录
+      updateLoginAttempt(data.email, true);
+      router.push('/dashboard');
     } catch (err) {
-      setError('网络错误，请稍后重试');
-      recaptchaRef.current?.reset();
+      setError('登录失败，请稍后重试');
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <div 
-      className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8"
-      role="main"
-      aria-label="登录页面"
-    >
-      <Card className="max-w-md w-full space-y-8">
-        <div>
-          <h1 className="mt-6 text-center text-3xl font-extrabold text-gray-900" id="login-title">
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+      <Card className="w-full max-w-md">
+        <div className="text-center mb-8">
+          <h2 className="text-3xl font-extrabold text-gray-900">
             登录到您的账户
-          </h1>
-          <p className="mt-2 text-center text-sm text-gray-600">
-            或者{' '}
-            <a
-              href="/register"
-              className="font-medium text-indigo-600 hover:text-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-              aria-label="注册新账户"
-            >
-              注册新账户
-            </a>
-          </p>
+          </h2>
         </div>
-
-        <Form 
-          form={form} 
-          onSubmit={onSubmit} 
-          className="mt-8 space-y-6"
-          role="form"
-          aria-labelledby="login-title"
-        >
-          {({ isSubmitting }) => (
-            <>
-              <div className="rounded-md shadow-sm space-y-4">
-                <div>
-                  <label htmlFor="email" className="sr-only">
-                    邮箱地址
-                  </label>
-                  <Input
-                    {...form.register('email', { required: '邮箱地址是必填项' })}
-                    id="email"
-                    type="email"
-                    placeholder="邮箱地址"
-                    error={form.formState.errors.email?.message}
-                    aria-required="true"
-                    aria-invalid={!!form.formState.errors.email}
-                    aria-describedby={form.formState.errors.email ? 'email-error' : undefined}
-                  />
-                </div>
-                <div>
-                  <label htmlFor="password" className="sr-only">
-                    密码
-                  </label>
-                  <Input
-                    {...form.register('password', { required: '密码是必填项' })}
-                    id="password"
-                    type="password"
-                    placeholder="密码"
-                    error={form.formState.errors.password?.message}
-                    aria-required="true"
-                    aria-invalid={!!form.formState.errors.password}
-                    aria-describedby={form.formState.errors.password ? 'password-error' : undefined}
-                  />
-                </div>
-              </div>
-
-              {error && (
-                <div 
-                  className="rounded-md bg-red-50 p-4" 
-                  role="alert"
-                  data-testid="form-error"
-                >
-                  <div className="text-sm text-red-700">{error}</div>
-                </div>
-              )}
-
-              <div 
-                className="flex justify-center"
-                aria-label="人机验证"
-              >
-                <ReCAPTCHA
-                  ref={recaptchaRef}
-                  sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY || ''}
-                  onChange={setRecaptchaToken}
-                  tabIndex={0}
-                />
-              </div>
-
-              <div>
-                <Button
-                  type="submit"
-                  className="w-full focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                  data-testid="submit-button"
-                  aria-busy={isSubmitting || isLoading}
-                  aria-disabled={isSubmitting || isLoading}
-                >
-                  {isSubmitting || isLoading ? '登录中...' : '登录'}
-                </Button>
-              </div>
-            </>
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+          <Input
+            label="邮箱地址"
+            type="email"
+            placeholder="请输入邮箱地址"
+            {...register('email', {
+              required: '请输入邮箱地址',
+              pattern: {
+                value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+                message: '请输入有效的邮箱地址',
+              },
+            })}
+            error={errors.email?.message}
+          />
+          <Input
+            label="密码"
+            type="password"
+            placeholder="请输入密码"
+            {...register('password', {
+              required: '请输入密码',
+              validate: validatePassword,
+            })}
+            error={errors.password?.message}
+          />
+          {error && (
+            <div className="text-red-600 text-sm" data-testid="error-message">{error}</div>
           )}
-        </Form>
+          <div className="flex justify-center">
+            <ReCAPTCHA
+              ref={recaptchaRef}
+              sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY || ''}
+              onChange={(token) => setRecaptchaToken(token)}
+            />
+          </div>
+          <Button
+            type="submit"
+            loading={isLoading}
+            disabled={isLoading}
+            className="w-full"
+            data-testid="submit-button"
+          >
+            登录
+          </Button>
+        </form>
       </Card>
     </div>
   );

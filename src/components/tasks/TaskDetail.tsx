@@ -5,6 +5,7 @@ import { formatDate } from '@/lib/utils/date';
 import { getTaskById, Task } from '@/lib/api/task';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { RetryButton } from '@/components/ui/retry-button';
 
 interface TaskDetailProps {
   taskId: string;
@@ -15,21 +16,23 @@ export function TaskDetail({ taskId }: TaskDetailProps) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    async function fetchTask() {
-      try {
-        setLoading(true);
-        setError(null);
-        const taskData = await getTaskById(taskId);
-        setTask(taskData);
-      } catch (err) {
-        setError('获取任务详情失败');
-      } finally {
-        setLoading(false);
-      }
+  const fetchTask = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const taskData = await getTaskById(taskId);
+      setTask(taskData);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : '获取任务详情失败');
+    } finally {
+      setLoading(false);
     }
+  };
 
-    fetchTask();
+  useEffect(() => {
+    if (taskId) {
+      fetchTask();
+    }
   }, [taskId]);
 
   if (loading) {
@@ -49,8 +52,9 @@ export function TaskDetail({ taskId }: TaskDetailProps) {
 
   if (error) {
     return (
-      <Alert variant="destructive">
+      <Alert variant="destructive" className="flex items-center justify-between">
         <AlertDescription>{error}</AlertDescription>
+        <RetryButton onClick={fetchTask} />
       </Alert>
     );
   }

@@ -1,35 +1,45 @@
 import React from 'react'
-import { TaskFilters as TaskFiltersType, TaskStatus, TaskPriority } from '@/types/task'
+import { TaskStatus, TaskPriority, TaskFilters as TaskFiltersType } from '@/types/task'
 
 interface TaskFiltersProps {
   filters: TaskFiltersType
   onChange: (filters: TaskFiltersType) => void
 }
 
-export default function TaskFilters({ filters, onChange }: TaskFiltersProps) {
-  const handleStatusChange = (status: TaskStatus | '') => {
-    onChange({
-      ...filters,
-      status: status || undefined,
-    })
+export function TaskFilters({ filters, onChange }: TaskFiltersProps) {
+  const handleStatusChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const value = e.target.value as TaskStatus | ''
+    if (value === '') {
+      const { status, ...rest } = filters
+      onChange(rest)
+    } else {
+      onChange({ ...filters, status: value })
+    }
   }
 
-  const handlePriorityChange = (priority: TaskPriority | '') => {
-    onChange({
-      ...filters,
-      priority: priority || undefined,
-    })
+  const handlePriorityChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const value = e.target.value as TaskPriority | ''
+    if (value === '') {
+      const { priority, ...rest } = filters
+      onChange(rest)
+    } else {
+      onChange({ ...filters, priority: value })
+    }
   }
 
   return (
     <div className="flex space-x-4">
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">
+        <label
+          htmlFor="status-filter"
+          className="block text-sm font-medium text-gray-700 mb-1"
+        >
           状态
         </label>
         <select
+          id="status-filter"
           value={filters.status || ''}
-          onChange={(e) => handleStatusChange(e.target.value as TaskStatus | '')}
+          onChange={handleStatusChange}
           className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
         >
           <option value="">全部</option>
@@ -42,12 +52,16 @@ export default function TaskFilters({ filters, onChange }: TaskFiltersProps) {
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">
+        <label
+          htmlFor="priority-filter"
+          className="block text-sm font-medium text-gray-700 mb-1"
+        >
           优先级
         </label>
         <select
+          id="priority-filter"
           value={filters.priority || ''}
-          onChange={(e) => handlePriorityChange(e.target.value as TaskPriority | '')}
+          onChange={handlePriorityChange}
           className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
         >
           <option value="">全部</option>

@@ -1,63 +1,40 @@
-import React, { useState, useMemo } from 'react'
-import { Task, TaskStatus, TaskPriority, TaskFilters, TaskSortOptions } from '@/types/task'
-import TaskCard from './TaskCard'
-import TaskFilters from './TaskFilters'
-import TaskSort from './TaskSort'
+import React from 'react'
+import { Task, TaskStatus, TaskPriority } from '@/types/task'
+import { TaskCard } from './TaskCard'
+import { TaskFilters } from './TaskFilters'
+import { TaskSort } from './TaskSort'
 
 interface TaskListProps {
   tasks: Task[]
-  onTaskUpdate: (taskId: string, updates: Partial<Task>) => Promise<void>
-  onTaskDelete: (taskId: string) => Promise<void>
+  onTaskUpdate: (taskId: string, updates: Partial<Task>) => void
+  onTaskDelete: (taskId: string) => void
+  filters: {
+    status?: TaskStatus
+    priority?: TaskPriority
+    search?: string
+  }
+  onFiltersChange: (filters: { status?: TaskStatus; priority?: TaskPriority; search?: string }) => void
+  sortBy: string
+  onSortChange: (sortBy: string) => void
 }
 
-export default function TaskList({ tasks, onTaskUpdate, onTaskDelete }: TaskListProps) {
-  const [filters, setFilters] = useState<TaskFilters>({})
-  const [sortOptions, setSortOptions] = useState<TaskSortOptions>({
-    field: 'createdAt',
-    direction: 'desc',
-  })
-
-  // 应用筛选
-  const filteredTasks = useMemo(() => {
-    return tasks.filter((task) => {
-      if (filters.status && task.status !== filters.status) return false
-      if (filters.priority && task.priority !== filters.priority) return false
-      if (filters.assigneeId && task.assigneeId !== filters.assigneeId) return false
-      if (filters.creatorId && task.creatorId !== filters.creatorId) return false
-      return true
-    })
-  }, [tasks, filters])
-
-  // 应用排序
-  const sortedTasks = useMemo(() => {
-    return [...filteredTasks].sort((a, b) => {
-      const aValue = a[sortOptions.field]
-      const bValue = b[sortOptions.field]
-      
-      if (sortOptions.direction === 'asc') {
-        return aValue > bValue ? 1 : -1
-      }
-      return aValue < bValue ? 1 : -1
-    })
-  }, [filteredTasks, sortOptions])
-
-  const handleFilterChange = (newFilters: TaskFilters) => {
-    setFilters(newFilters)
-  }
-
-  const handleSortChange = (newSort: TaskSortOptions) => {
-    setSortOptions(newSort)
-  }
-
+export function TaskList({
+  tasks,
+  onTaskUpdate,
+  onTaskDelete,
+  filters,
+  onFiltersChange,
+  sortBy,
+  onSortChange,
+}: TaskListProps) {
   return (
     <div className="space-y-4">
-      <div className="flex justify-between items-center">
-        <TaskFilters filters={filters} onChange={handleFilterChange} />
-        <TaskSort sort={sortOptions} onChange={handleSortChange} />
+      <div className="flex flex-col sm:flex-row justify-between gap-4">
+        <TaskFilters filters={filters} onChange={onFiltersChange} />
+        <TaskSort value={sortBy} onChange={onSortChange} />
       </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {sortedTasks.map((task) => (
+      <div className="grid gap-4">
+        {tasks.map((task) => (
           <TaskCard
             key={task.id}
             task={task}
@@ -66,12 +43,6 @@ export default function TaskList({ tasks, onTaskUpdate, onTaskDelete }: TaskList
           />
         ))}
       </div>
-
-      {sortedTasks.length === 0 && (
-        <div className="text-center py-8 text-gray-500">
-          没有找到符合条件的任务
-        </div>
-      )}
     </div>
   )
 } 
