@@ -62,8 +62,8 @@
   - 课程资源模型设计完成
 - 课程API开发进行中
   - 课程CRUD接口已完成
-  - 课程分类接口开发中
-  - 课程时间表接口规划中
+  - 课程分类CRUD接口已完成
+  - 课程时间表接口开发中
   - 课程资源接口规划中
 
 ### 1.3 开发计划
@@ -88,7 +88,7 @@
     - [x] 课程数据模型
     - [ ] 课程API
       - [x] 课程CRUD接口
-      - [ ] 课程分类CRUD接口
+      - [x] 课程分类CRUD接口
       - [ ] 课程时间表CRUD接口
       - [ ] 课程资源CRUD接口
     - [ ] 课程组件
@@ -144,6 +144,12 @@ prisma/
 
 src/
 ├── app/                    # Next.js App Router 页面
+│   ├── api/                # API 路由
+│   │   ├── auth/           # 认证相关API
+│   │   ├── courses/        # 课程相关API
+│   │   │   └── [id]/       # 单个课程API
+│   │   └── course-categories/ # 课程分类API
+│   │       └── [id]/       # 单个课程分类API
 ├── components/            # React 组件
 ├── lib/                   # 工具函数和共享逻辑
 └── types/                # TypeScript 类型定义
