@@ -1,5 +1,8 @@
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import { TaskDetail } from '../TaskDetail';
+import { getTaskById } from '@/lib/api/task';
+
+jest.mock('@/lib/api/task');
 
 const mockTask = {
   id: '1',
@@ -17,14 +20,45 @@ const mockTask = {
 };
 
 describe('TaskDetail', () => {
-  it('renders task details correctly', () => {
-    render(<TaskDetail task={mockTask} />);
-    
-    expect(screen.getByText('测试任务')).toBeInTheDocument();
-    expect(screen.getByText('这是一个测试任务的描述')).toBeInTheDocument();
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it('显示加载状态', () => {
+    (getTaskById as jest.Mock).mockImplementation(() => new Promise(() => {}));
+    render(<TaskDetail taskId="1" />);
+    expect(screen.getByTestId('loading-skeleton')).toBeInTheDocument();
+  });
+
+  it('成功加载并显示任务详情', async () => {
+    (getTaskById as jest.Mock).mockResolvedValue(mockTask);
+    render(<TaskDetail taskId="1" />);
+
+    await waitFor(() => {
+      expect(screen.getByText('测试任务')).toBeInTheDocument();
+    });
+
     expect(screen.getByText('进行中')).toBeInTheDocument();
     expect(screen.getByText('高优先级')).toBeInTheDocument();
-    expect(screen.getByText('负责人：')).toBeInTheDocument();
-    expect(screen.getByText('测试用户')).toBeInTheDocument();
+    expect(screen.getByText('这是一个测试任务的描述')).toBeInTheDocument();
+    expect(screen.getByText(/测试用户/)).toBeInTheDocument();
+  });
+
+  it('显示错误信息当加载失败时', async () => {
+    (getTaskById as jest.Mock).mockRejectedValue(new Error('获取任务详情失败'));
+    render(<TaskDetail taskId="1" />);
+
+    await waitFor(() => {
+      expect(screen.getByText('获取任务详情失败')).toBeInTheDocument();
+    });
+  });
+
+  it('显示未找到任务信息当任务不存在时', async () => {
+    (getTaskById as jest.Mock).mockResolvedValue(null);
+    render(<TaskDetail taskId="999" />);
+
+    await waitFor(() => {
+      expect(screen.getByText('未找到任务')).toBeInTheDocument();
+    });
   });
 }); 

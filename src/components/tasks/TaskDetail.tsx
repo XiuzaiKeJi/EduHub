@@ -1,64 +1,85 @@
-import { Card } from '@/components/display/Card';
+import { useEffect, useState } from 'react';
+import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/display/Badge';
 import { formatDate } from '@/lib/utils/date';
+import { getTaskById, Task } from '@/lib/api/task';
+import { Skeleton } from '@/components/ui/skeleton';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 
 interface TaskDetailProps {
-  task: {
-    id: string;
-    title: string;
-    description: string;
-    status: 'TODO' | 'IN_PROGRESS' | 'DONE';
-    priority: 'LOW' | 'MEDIUM' | 'HIGH';
-    dueDate: string;
-    createdAt: string;
-    updatedAt: string;
-    assignee?: {
-      id: string;
-      name: string;
-    };
-  };
+  taskId: string;
 }
 
-export function TaskDetail({ task }: TaskDetailProps) {
+export function TaskDetail({ taskId }: TaskDetailProps) {
+  const [task, setTask] = useState<Task | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    async function fetchTask() {
+      try {
+        setLoading(true);
+        setError(null);
+        const taskData = await getTaskById(taskId);
+        setTask(taskData);
+      } catch (err) {
+        setError('获取任务详情失败');
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchTask();
+  }, [taskId]);
+
+  if (loading) {
+    return (
+      <Card className="p-6" data-testid="loading-skeleton">
+        <Skeleton className="h-8 w-3/4 mb-4" />
+        <Skeleton className="h-4 w-1/2 mb-2" />
+        <Skeleton className="h-4 w-1/3 mb-2" />
+        <Skeleton className="h-20 w-full mb-4" />
+        <div className="flex gap-2">
+          <Skeleton className="h-6 w-20" />
+          <Skeleton className="h-6 w-20" />
+        </div>
+      </Card>
+    );
+  }
+
+  if (error) {
+    return (
+      <Alert variant="destructive">
+        <AlertDescription>{error}</AlertDescription>
+      </Alert>
+    );
+  }
+
+  if (!task) {
+    return (
+      <Alert>
+        <AlertDescription>未找到任务</AlertDescription>
+      </Alert>
+    );
+  }
+
   return (
-    <Card>
-      <div className="space-y-4">
-        <div className="flex justify-between items-start">
-          <h2 className="text-xl font-semibold">{task.title}</h2>
-          <div className="flex gap-2">
-            <Badge type={task.status === 'DONE' ? 'success' : task.status === 'IN_PROGRESS' ? 'warning' : 'info'}>
-              {task.status === 'TODO' ? '待处理' : task.status === 'IN_PROGRESS' ? '进行中' : '已完成'}
-            </Badge>
-            <Badge type={task.priority === 'HIGH' ? 'error' : task.priority === 'MEDIUM' ? 'warning' : 'info'}>
-              {task.priority === 'HIGH' ? '高优先级' : task.priority === 'MEDIUM' ? '中优先级' : '低优先级'}
-            </Badge>
-          </div>
-        </div>
-
-        <div className="prose max-w-none">
-          <p>{task.description}</p>
-        </div>
-
-        <div className="grid grid-cols-2 gap-4 text-sm text-gray-600">
-          <div>
-            <span className="font-medium">截止日期：</span>
-            <span>{formatDate(task.dueDate)}</span>
-          </div>
-          <div>
-            <span className="font-medium">创建时间：</span>
-            <span>{formatDate(task.createdAt)}</span>
-          </div>
-          <div>
-            <span className="font-medium">最后更新：</span>
-            <span>{formatDate(task.updatedAt)}</span>
-          </div>
-          {task.assignee && (
-            <div>
-              <span className="font-medium">负责人：</span>
-              <span>{task.assignee.name}</span>
-            </div>
-          )}
-        </div>
+    <Card className="p-6">
+      <h2 className="text-2xl font-bold mb-4">{task.title}</h2>
+      <div className="flex gap-2 mb-4">
+        <Badge variant={task.status === 'DONE' ? 'success' : task.status === 'IN_PROGRESS' ? 'warning' : 'default'}>
+          {task.status === 'DONE' ? '已完成' : task.status === 'IN_PROGRESS' ? '进行中' : '待处理'}
+        </Badge>
+        <Badge variant={task.priority === 'HIGH' ? 'destructive' : task.priority === 'MEDIUM' ? 'warning' : 'default'}>
+          {task.priority === 'HIGH' ? '高优先级' : task.priority === 'MEDIUM' ? '中优先级' : '低优先级'}
+        </Badge>
+      </div>
+      <p className="text-gray-600 mb-4">{task.description}</p>
+      <div className="text-sm text-gray-500">
+        <p>截止日期: {formatDate(task.dueDate)}</p>
+        {task.assignee && <p>负责人: {task.assignee.name}</p>}
+        <p>创建时间: {formatDate(task.createdAt)}</p>
+        <p>最后更新: {formatDate(task.updatedAt)}</p>
       </div>
     </Card>
   );
