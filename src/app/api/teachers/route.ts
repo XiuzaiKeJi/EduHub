@@ -1,14 +1,27 @@
-import { prisma } from '@/lib/db'
 import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
-import { authOptions } from '@/lib/auth'
 import { z } from 'zod'
 
-// 创建教师请求体验证
-const createTeacherSchema = z.object({
+import { prisma } from '@/lib/prisma'
+import { authOptions } from '@/lib/auth'
+
+// 定义教师查询参数验证模式
+const teacherQuerySchema = z.object({
+  page: z.string().optional().transform(Number).default('1'),
+  pageSize: z.string().optional().transform(Number).default('9'),
+  sortBy: z.enum(['name', 'title', 'department', 'createdAt', 'updatedAt']).optional().default('name'),
+  sortOrder: z.enum(['asc', 'desc']).optional().default('asc'),
+  search: z.string().optional(),
+  title: z.string().optional(),
+  specialties: z.string().optional(),
+})
+
+// 定义教师创建验证模式
+const teacherCreateSchema = z.object({
   userId: z.string().min(1, '用户ID不能为空'),
   title: z.string().optional(),
   bio: z.string().optional(),
+  department: z.string().optional(),
   education: z.string().optional(),
   experience: z.string().optional(),
   specialties: z.string().optional(),
@@ -19,77 +32,94 @@ const createTeacherSchema = z.object({
   officeLocation: z.string().optional(),
 })
 
-// 查询参数验证
-const querySchema = z.object({
-  page: z.string().optional().transform(val => val ? parseInt(val) : 1),
-  pageSize: z.string().optional().transform(val => val ? parseInt(val) : 10),
-  search: z.string().optional(),
-  title: z.string().optional(),
-  specialties: z.string().optional(),
-  sortBy: z.enum(['name', 'title', 'createdAt']).optional().default('name'),
-  sortOrder: z.enum(['asc', 'desc']).optional().default('asc'),
-})
-
-// GET /api/teachers
+// GET 方法：获取教师列表
 export async function GET(request: NextRequest) {
   try {
-    // 获取会话信息
+    // 获取会话信息，验证用户是否已登录
     const session = await getServerSession(authOptions)
-    if (!session) {
-      return NextResponse.json(
-        { error: '未授权访问' },
-        { status: 401 }
-      )
+    if (!session?.user) {
+      return NextResponse.json({ error: '未授权访问' }, { status: 401 })
     }
 
     // 解析查询参数
-    const { searchParams } = request.nextUrl
-    const result = querySchema.safeParse(Object.fromEntries(searchParams.entries()))
+    const { searchParams } = new URL(request.url)
+    const validatedParams = teacherQuerySchema.parse(Object.fromEntries(searchParams))
     
-    if (!result.success) {
-      return NextResponse.json(
-        { error: '查询参数无效', details: result.error.format() },
-        { status: 400 }
-      )
-    }
-
     const { 
-      page, 
-      pageSize, 
-      search, 
-      title, 
-      specialties, 
-      sortBy, 
-      sortOrder 
-    } = result.data
-
-    // 构建查询条件
-    let where: any = {}
+      page,
+      pageSize,
+      sortBy,
+      sortOrder,
+      search,
+      title,
+      specialties
+    } = validatedParams
     
+    // 构建过滤条件
+    const where: any = {}
+    
+    // 处理搜索查询
     if (search) {
-      where = {
-        OR: [
-          { user: { name: { contains: search } } },
-          { title: { contains: search } },
-          { bio: { contains: search } },
-          { specialties: { contains: search } },
-          { subjects: { contains: search } },
-        ],
+      where.OR = [
+        { 
+          user: {
+            name: {
+              contains: search,
+              mode: 'insensitive'
+            }
+          }
+        },
+        {
+          title: {
+            contains: search,
+            mode: 'insensitive'
+          }
+        },
+        {
+          specialties: {
+            contains: search,
+            mode: 'insensitive'
+          }
+        },
+        {
+          subjects: {
+            contains: search,
+            mode: 'insensitive'
+          }
+        }
+      ]
+    }
+    
+    // 处理职称筛选
+    if (title) {
+      where.title = {
+        equals: title,
+        mode: 'insensitive'
       }
     }
     
-    if (title) {
-      where.title = { contains: title }
+    // 处理专业领域筛选
+    if (specialties) {
+      where.specialties = {
+        contains: specialties,
+        mode: 'insensitive'
+      }
     }
     
-    if (specialties) {
-      where.specialties = { contains: specialties }
+    // 处理排序
+    const orderBy: any = {}
+    
+    // 特殊处理按姓名排序的情况（因为姓名在关联表中）
+    if (sortBy === 'name') {
+      orderBy.user = { name: sortOrder }
+    } else {
+      orderBy[sortBy] = sortOrder
     }
-
-    // 计算总数
+    
+    // 查询总数
     const total = await prisma.teacher.count({ where })
     
-    // 查询教师列表
+    // 分页查询教师列表
     const teachers = await prisma.teacher.findMany({
       where,
       include: {
@@ -98,44 +128,34 @@ export async function GET(request: NextRequest) {
             id: true,
             name: true,
             email: true,
-            role: true,
+            image: true,
             department: true,
-          },
-        },
-        qualifications: {
-          select: {
-            id: true,
-            name: true,
-            issuer: true,
-            issueDate: true,
-            expiryDate: true,
           }
         },
+        qualifications: true,
+        evaluations: {
+          include: {
+            course: {
+              select: {
+                id: true,
+                name: true,
+                code: true
+              }
+            }
+          }
+        }
       },
-      orderBy: sortBy === 'name' 
-        ? { user: { name: sortOrder } } 
-        : { [sortBy]: sortOrder },
+      orderBy,
       skip: (page - 1) * pageSize,
       take: pageSize,
     })
-
-    // 格式化日期
-    const formattedTeachers = teachers.map(teacher => ({
-      ...teacher,
-      createdAt: teacher.createdAt.toISOString(),
-      updatedAt: teacher.updatedAt.toISOString(),
-      qualifications: teacher.qualifications.map(qualification => ({
-        ...qualification,
-        issueDate: qualification.issueDate.toISOString(),
-        expiryDate: qualification.expiryDate ? qualification.expiryDate.toISOString() : null,
-      })),
-    }))
-
+    
     return NextResponse.json({
-      teachers: formattedTeachers,
+      teachers,
       total,
       page,
       pageSize,
+      totalPages: Math.ceil(total / pageSize)
     })
   } catch (error) {
     console.error('获取教师列表失败:', error)
@@ -146,121 +166,75 @@ export async function GET(request: NextRequest) {
   }
 }
 
-// POST /api/teachers
+// POST 方法：创建教师
 export async function POST(request: NextRequest) {
   try {
-    // 获取会话信息
+    // 获取会话信息，验证用户是否已登录且有权限
     const session = await getServerSession(authOptions)
-    if (!session) {
-      return NextResponse.json(
-        { error: '未授权访问' },
-        { status: 401 }
-      )
+    if (!session?.user) {
+      return NextResponse.json({ error: '未授权访问' }, { status: 401 })
     }
-
-    // 验证用户权限（只有管理员可以创建教师档案）
-    if (session.user.role !== 'ADMIN') {
-      return NextResponse.json(
-        { error: '权限不足' },
-        { status: 403 }
-      )
+    
+    // 验证用户是否有权限（管理员或教职工）
+    if (session.user.role !== 'ADMIN' && session.user.role !== 'STAFF') {
+      return NextResponse.json({ error: '权限不足' }, { status: 403 })
     }
-
+    
     // 解析请求体
     const body = await request.json()
-    const result = createTeacherSchema.safeParse(body)
     
-    if (!result.success) {
-      return NextResponse.json(
-        { error: '请求数据无效', details: result.error.format() },
-        { status: 400 }
-      )
-    }
-
-    const {
-      userId,
-      title,
-      bio,
-      education,
-      experience,
-      specialties,
-      subjects,
-      achievements,
-      contactInfo,
-      officeHours,
-      officeLocation,
-    } = result.data
-
+    // 验证请求数据
+    const validatedData = teacherCreateSchema.parse(body)
+    
     // 检查用户是否存在
-    const user = await prisma.user.findUnique({
-      where: { id: userId },
+    const userExists = await prisma.user.findUnique({
+      where: { id: validatedData.userId }
     })
-
-    if (!user) {
-      return NextResponse.json(
-        { error: '用户不存在' },
-        { status: 404 }
-      )
+    
+    if (!userExists) {
+      return NextResponse.json({ error: '用户不存在' }, { status: 404 })
     }
-
-    // 检查该用户是否已经有教师档案
-    const existingTeacher = await prisma.teacher.findUnique({
-      where: { userId },
+    
+    // 检查用户是否已经是教师
+    const teacherExists = await prisma.teacher.findUnique({
+      where: { userId: validatedData.userId }
     })
-
-    if (existingTeacher) {
-      return NextResponse.json(
-        { error: '该用户已有教师档案' },
-        { status: 409 }
-      )
+    
+    if (teacherExists) {
+      return NextResponse.json({ error: '该用户已经是教师' }, { status: 409 })
     }
-
-    // 更新用户角色为教师（如果尚未设置）
-    if (user.role !== 'TEACHER') {
-      await prisma.user.update({
-        where: { id: userId },
-        data: { role: 'TEACHER' },
-      })
-    }
-
-    // 创建教师档案
+    
+    // 创建教师记录
     const teacher = await prisma.teacher.create({
-      data: {
-        userId,
-        title,
-        bio,
-        education,
-        experience,
-        specialties,
-        subjects,
-        achievements,
-        contactInfo,
-        officeHours,
-        officeLocation,
-      },
+      data: validatedData,
       include: {
         user: {
           select: {
             id: true,
             name: true,
             email: true,
-            role: true,
+            image: true,
             department: true,
-          },
-        },
-      },
+          }
+        }
+      }
     })
-
-    return NextResponse.json(
-      {
-        ...teacher,
-        createdAt: teacher.createdAt.toISOString(),
-        updatedAt: teacher.updatedAt.toISOString(),
-      },
-      { status: 201 }
-    )
+    
+    // 更新用户角色为教师
+    await prisma.user.update({
+      where: { id: validatedData.userId },
+      data: { role: 'TEACHER' }
+    })
+    
+    return NextResponse.json(teacher, { status: 201 })
   } catch (error) {
     console.error('创建教师失败:', error)
+    if (error instanceof z.ZodError) {
+      return NextResponse.json(
+        { error: '数据验证失败', details: error.errors },
+        { status: 400 }
+      )
+    }
     return NextResponse.json(
       { error: '创建教师失败' },
       { status: 500 }

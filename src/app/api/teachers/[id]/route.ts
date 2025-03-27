@@ -1,13 +1,15 @@
-import { prisma } from '@/lib/db'
 import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
-import { authOptions } from '@/lib/auth'
 import { z } from 'zod'
 
-// 更新教师请求体验证
-const updateTeacherSchema = z.object({
+import { prisma } from '@/lib/prisma'
+import { authOptions } from '@/lib/auth'
+
+// 定义教师更新验证模式
+const teacherUpdateSchema = z.object({
   title: z.string().optional(),
   bio: z.string().optional(),
+  department: z.string().optional(),
   education: z.string().optional(),
   experience: z.string().optional(),
   specialties: z.string().optional(),
@@ -18,33 +20,30 @@ const updateTeacherSchema = z.object({
   officeLocation: z.string().optional(),
 })
 
-// GET /api/teachers/[id]
+// GET 方法：获取单个教师
 export async function GET(
   request: NextRequest,
   { params }: { params: { id: string } }
 ) {
   try {
-    // 获取会话信息
+    // 获取会话信息，验证用户是否已登录
     const session = await getServerSession(authOptions)
-    if (!session) {
-      return NextResponse.json(
-        { error: '未授权访问' },
-        { status: 401 }
-      )
+    if (!session?.user) {
+      return NextResponse.json({ error: '未授权访问' }, { status: 401 })
     }
 
-    const teacherId = params.id
+    const { id } = params
 
-    // 获取教师信息
+    // 查询教师信息
     const teacher = await prisma.teacher.findUnique({
-      where: { id: teacherId },
+      where: { id },
       include: {
         user: {
           select: {
             id: true,
             name: true,
             email: true,
-            role: true,
+            image: true,
             department: true,
           }
         },
@@ -55,7 +54,7 @@ export async function GET(
               select: {
                 id: true,
                 name: true,
-                code: true,
+                code: true
               }
             }
           }
@@ -64,125 +63,85 @@ export async function GET(
     })
 
     if (!teacher) {
-      return NextResponse.json(
-        { error: '教师不存在' },
-        { status: 404 }
-      )
+      return NextResponse.json({ error: '教师不存在' }, { status: 404 })
     }
 
-    // 格式化日期
-    const formattedTeacher = {
-      ...teacher,
-      createdAt: teacher.createdAt.toISOString(),
-      updatedAt: teacher.updatedAt.toISOString(),
-      qualifications: teacher.qualifications.map(qualification => ({
-        ...qualification,
-        issueDate: qualification.issueDate.toISOString(),
-        expiryDate: qualification.expiryDate ? qualification.expiryDate.toISOString() : null,
-        createdAt: qualification.createdAt.toISOString(),
-        updatedAt: qualification.updatedAt.toISOString(),
-      })),
-      evaluations: teacher.evaluations.map(evaluation => ({
-        ...evaluation,
-        createdAt: evaluation.createdAt.toISOString(),
-        updatedAt: evaluation.updatedAt.toISOString(),
-        evaluationDate: evaluation.evaluationDate.toISOString(),
-      })),
-    }
-
-    return NextResponse.json(formattedTeacher)
+    return NextResponse.json(teacher)
   } catch (error) {
-    console.error('获取教师详情失败:', error)
+    console.error('获取教师信息失败:', error)
     return NextResponse.json(
-      { error: '获取教师详情失败' },
+      { error: '获取教师信息失败' },
       { status: 500 }
     )
   }
 }
 
-// PATCH /api/teachers/[id]
+// PATCH 方法：更新教师
 export async function PATCH(
   request: NextRequest,
   { params }: { params: { id: string } }
 ) {
   try {
-    // 获取会话信息
+    // 获取会话信息，验证用户是否已登录
     const session = await getServerSession(authOptions)
-    if (!session) {
-      return NextResponse.json(
-        { error: '未授权访问' },
-        { status: 401 }
-      )
+    if (!session?.user) {
+      return NextResponse.json({ error: '未授权访问' }, { status: 401 })
     }
 
-    const teacherId = params.id
-    
-    // 验证当前用户是否有权限更新该教师信息（管理员或自己）
+    const { id } = params
+
+    // 验证教师是否存在
     const teacher = await prisma.teacher.findUnique({
-      where: { id: teacherId },
-      select: { userId: true }
+      where: { id },
+      include: { user: true }
     })
 
     if (!teacher) {
-      return NextResponse.json(
-        { error: '教师不存在' },
-        { status: 404 }
-      )
+      return NextResponse.json({ error: '教师不存在' }, { status: 404 })
     }
 
-    const isAdmin = session.user.role === 'ADMIN'
-    const isTeacherSelf = teacher.userId === session.user.id
-
-    if (!isAdmin && !isTeacherSelf) {
-      return NextResponse.json(
-        { error: '权限不足' },
-        { status: 403 }
-      )
+    // 验证用户权限
+    // 只允许自己（如果是教师）、管理员或教职工更新教师信息
+    if (
+      session.user.id !== teacher.userId &&
+      session.user.role !== 'ADMIN' &&
+      session.user.role !== 'STAFF'
+    ) {
+      return NextResponse.json({ error: '权限不足' }, { status: 403 })
     }
 
-    // 验证请求数据
+    // 解析请求体
     const body = await request.json()
-    const result = updateTeacherSchema.safeParse(body)
     
-    if (!result.success) {
-      return NextResponse.json(
-        { error: '请求数据无效', details: result.error.format() },
-        { status: 400 }
-      )
-    }
+    // 验证请求数据
+    const validatedData = teacherUpdateSchema.parse(body)
 
     // 更新教师信息
     const updatedTeacher = await prisma.teacher.update({
-      where: { id: teacherId },
-      data: result.data,
+      where: { id },
+      data: validatedData,
       include: {
         user: {
           select: {
             id: true,
             name: true,
             email: true,
-            role: true,
+            image: true,
             department: true,
           }
-        },
-        qualifications: true,
+        }
       }
     })
 
-    return NextResponse.json({
-      ...updatedTeacher,
-      createdAt: updatedTeacher.createdAt.toISOString(),
-      updatedAt: updatedTeacher.updatedAt.toISOString(),
-      qualifications: updatedTeacher.qualifications.map(qualification => ({
-        ...qualification,
-        issueDate: qualification.issueDate.toISOString(),
-        expiryDate: qualification.expiryDate ? qualification.expiryDate.toISOString() : null,
-        createdAt: qualification.createdAt.toISOString(),
-        updatedAt: qualification.updatedAt.toISOString(),
-      })),
-    })
+    return NextResponse.json(updatedTeacher)
   } catch (error) {
     console.error('更新教师信息失败:', error)
+    if (error instanceof z.ZodError) {
+      return NextResponse.json(
+        { error: '数据验证失败', details: error.errors },
+        { status: 400 }
+      )
+    }
     return NextResponse.json(
       { error: '更新教师信息失败' },
       { status: 500 }
@@ -190,69 +149,57 @@ export async function PATCH(
   }
 }
 
-// DELETE /api/teachers/[id]
+// DELETE 方法：删除教师
 export async function DELETE(
   request: NextRequest,
   { params }: { params: { id: string } }
 ) {
   try {
-    // 获取会话信息
+    // 获取会话信息，验证用户是否已登录
     const session = await getServerSession(authOptions)
-    if (!session) {
-      return NextResponse.json(
-        { error: '未授权访问' },
-        { status: 401 }
-      )
+    if (!session?.user) {
+      return NextResponse.json({ error: '未授权访问' }, { status: 401 })
     }
 
-    // 验证用户权限（只有管理员可以删除教师档案）
+    // 验证用户权限（只有管理员可以删除教师）
     if (session.user.role !== 'ADMIN') {
-      return NextResponse.json(
-        { error: '权限不足' },
-        { status: 403 }
-      )
+      return NextResponse.json({ error: '权限不足' }, { status: 403 })
     }
 
-    const teacherId = params.id
+    const { id } = params
 
-    // 查找教师信息
+    // 验证教师是否存在
     const teacher = await prisma.teacher.findUnique({
-      where: { id: teacherId },
-      include: {
-        qualifications: true,
-        evaluations: true,
-      }
+      where: { id },
+      include: { user: true }
     })
 
     if (!teacher) {
-      return NextResponse.json(
-        { error: '教师不存在' },
-        { status: 404 }
-      )
+      return NextResponse.json({ error: '教师不存在' }, { status: 404 })
     }
 
-    // 删除关联的资质和评价
-    if (teacher.qualifications.length > 0) {
-      await prisma.teacherQualification.deleteMany({
-        where: { teacherId },
+    // 使用事务删除教师及相关数据
+    await prisma.$transaction([
+      // 删除教师的资质
+      prisma.teacherQualification.deleteMany({
+        where: { teacherId: id }
+      }),
+      // 删除教师的评价
+      prisma.teacherEvaluation.deleteMany({
+        where: { teacherId: id }
+      }),
+      // 删除教师记录
+      prisma.teacher.delete({
+        where: { id }
+      }),
+      // 更新用户角色
+      prisma.user.update({
+        where: { id: teacher.userId },
+        data: { role: 'USER' }
       })
-    }
+    ])
 
-    if (teacher.evaluations.length > 0) {
-      await prisma.teacherEvaluation.deleteMany({
-        where: { teacherId },
-      })
-    }
-
-    // 删除教师档案
-    await prisma.teacher.delete({
-      where: { id: teacherId },
-    })
-
-    return NextResponse.json(
-      { message: '教师档案已成功删除' },
-      { status: 200 }
-    )
+    return NextResponse.json({ message: '教师已成功删除' })
   } catch (error) {
     console.error('删除教师失败:', error)
     return NextResponse.json(
