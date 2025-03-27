@@ -68,9 +68,11 @@
 
 - [ ] 课程资源CRUD接口
   - 任务描述：实现课程资源创建、读取、更新、删除API接口
-  - 相关文件：src/app/api/courses/[id]/resources/route.ts
+  - 相关文件：src/app/api/courses/[id]/resources/route.ts, src/app/api/courses/[id]/resources/[resourceId]/route.ts
   - 具体实现：创建RESTful API，支持课程资源的CRUD操作
   - 优先级：中
+  - 状态：已完成
+  - 完成说明：实现了课程资源的创建、读取、更新和删除API接口。创建了src/app/api/courses/[id]/resources/route.ts文件用于获取课程资源列表和创建课程资源，以及src/app/api/courses/[id]/resources/[resourceId]/route.ts文件用于获取、更新和删除单个课程资源。接口包含适当的错误处理、数据验证和权限验证，支持资源的标题、描述、类型、URL等属性管理。资源列表支持按顺序和标题排序，单个资源操作包含完整的错误处理和资源存在性验证。
 
 ### 2. 教师管理模块
 
