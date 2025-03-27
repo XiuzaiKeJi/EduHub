@@ -123,6 +123,32 @@
   - 相关文件：prisma/schema.prisma, src/types/teacher.ts
   - 具体实现：创建Teacher模型，扩展User模型，包含id、userId、title、department、bio等字段
   - 优先级：中
+  - 状态：已完成
+  - 完成说明：已创建Teacher模型作为User模型的扩展，包含title、bio、education、experience等教师特有信息。同时创建了TeacherQualification和TeacherEvaluation模型以支持教师资质和评价功能。在types目录下创建了对应的TypeScript接口定义，并完成了Prisma迁移。
+
+- [x] 创建教师资质模型
+  - 任务描述：在prisma/schema.prisma中定义教师资质数据模型
+  - 相关文件：prisma/schema.prisma, src/types/teacher.ts
+  - 具体实现：创建TeacherQualification模型，包含id、teacherId、name、issuer、issueDate等字段
+  - 优先级：中
+  - 状态：已完成
+  - 完成说明：已创建TeacherQualification模型，用于存储教师的资质信息，包含资质名称、颁发机构、颁发日期、过期日期等信息。在types目录下创建了对应的TypeScript接口定义，并完成了Prisma迁移。
+
+- [x] 创建教师评价模型
+  - 任务描述：在prisma/schema.prisma中定义教师评价数据模型
+  - 相关文件：prisma/schema.prisma, src/types/teacher.ts
+  - 具体实现：创建TeacherEvaluation模型，包含id、teacherId、courseId、rating、comment等字段
+  - 优先级：中
+  - 状态：已完成
+  - 完成说明：已创建TeacherEvaluation模型，用于存储对教师的评价信息，包含评分、评论内容、所属课程、学期等信息。在types目录下创建了对应的TypeScript接口定义，并完成了Prisma迁移。
+
+#### 2.2 教师API
+- [ ] 教师CRUD接口
+  - 任务描述：实现教师创建、读取、更新、删除API接口
+  - 相关文件：src/app/api/teachers/route.ts, src/app/api/teachers/[id]/route.ts
+  - 具体实现：创建RESTful API，支持教师信息的CRUD操作
+  - 优先级：中
+  - 状态：进行中
 
 ## 依赖关系
 

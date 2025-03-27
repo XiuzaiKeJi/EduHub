@@ -29,6 +29,8 @@ model User {
   importExports ImportExport[]
   teachingCourses Course[] @relation("CourseTeacher")
   teachingSchedules CourseSchedule[] @relation("ScheduleTeacher")
+  // 教师信息
+  teacherProfile Teacher?
 }
 
 // 任务模型
@@ -194,6 +196,8 @@ model Course {
   schedules   CourseSchedule[]
   resources   CourseResource[]
   files       CourseFile[]
+  // 教师评价
+  evaluations TeacherEvaluation[]
 
   @@index([categoryId])
   @@index([teacherId])
@@ -250,4 +254,61 @@ model ImportExport {
   completedAt DateTime?
   userId      String
   user        User     @relation(fields: [userId], references: [id])
+}
+
+// 教师模型
+model Teacher {
+  id          String   @id @default(cuid())
+  userId      String   @unique
+  user        User     @relation(fields: [userId], references: [id])
+  title       String?  // 职称
+  bio         String?  // 个人简介
+  education   String?  // 学历背景
+  experience  String?  // 教学经验
+  specialties String?  // 专业特长
+  subjects    String?  // 教授科目
+  achievements String? // 成就和荣誉
+  contactInfo String?  // 联系方式
+  officeHours String?  // 办公时间
+  officeLocation String? // 办公地点
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  // 教师资质
+  qualifications TeacherQualification[]
+  // 教师评价
+  evaluations    TeacherEvaluation[]
+}
+
+// 教师资质模型
+model TeacherQualification {
+  id          String   @id @default(cuid())
+  teacherId   String
+  teacher     Teacher  @relation(fields: [teacherId], references: [id])
+  name        String   // 资质名称
+  issuer      String   // 颁发机构
+  issueDate   DateTime // 颁发日期
+  expiryDate  DateTime? // 过期日期
+  description String?  // 资质描述
+  certificate String?  // 证书URL
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+// 教师评价模型
+model TeacherEvaluation {
+  id          String   @id @default(cuid())
+  teacherId   String
+  teacher     Teacher  @relation(fields: [teacherId], references: [id])
+  courseId    String?
+  course      Course?  @relation(fields: [courseId], references: [id])
+  rating      Int      // 评分 1-5
+  comment     String?  // 评价内容
+  semester    String?  // 学期
+  anonymous   Boolean  @default(true) // 是否匿名
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  @@index([teacherId])
+  @@index([courseId])
 } 
