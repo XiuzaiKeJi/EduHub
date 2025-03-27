@@ -27,8 +27,8 @@ model User {
   department    String?
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
-  tasks         Task[]    @relation("AssignedTo")
-  createdTasks  Task[]    @relation("CreatedBy")
+  tasks         Task[]    @relation("TaskAssignee")
+  createdTasks  Task[]    @relation("TaskCreator")
   comments      Comment[]
   notifications Notification[]
   systemLogs    SystemLog[]
@@ -47,10 +47,10 @@ model Task {
   dueDate     DateTime?
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
-  createdBy   User      @relation("CreatedBy", fields: [creatorId], references: [id])
+  createdBy   User      @relation("TaskCreator", fields: [creatorId], references: [id])
   creatorId   String
-  assignedTo  User      @relation("AssignedTo", fields: [assigneeId], references: [id])
-  assigneeId  String
+  assignedTo  User      @relation("TaskAssignee", fields: [assigneeId], references: [id])
+  assigneeId  String?
   course      Course?   @relation(fields: [courseId], references: [id])
   courseId    String?
   comments    Comment[]
@@ -58,6 +58,13 @@ model Task {
   tags        Tag[]
   dependencies TaskDependency[] @relation("TaskDependencies")
   dependentOn  TaskDependency[] @relation("DependentOn")
+
+  // 索引
+  @@index([status])
+  @@index([priority])
+  @@index([dueDate])
+  @@index([assigneeId])
+  @@index([creatorId])
 }
 
 // 评论模型
