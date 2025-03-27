@@ -18,7 +18,8 @@ import {
   Edit,
   Trash2,
   Mail,
-  Building2
+  Building2,
+  UserCircle
 } from 'lucide-react'
 import { Course } from '@/types/course'
 
@@ -137,6 +138,7 @@ export const CourseDetail: FC<CourseDetailProps> = ({
           <TabsTrigger value="resources">课程资源</TabsTrigger>
           <TabsTrigger value="tasks">相关任务</TabsTrigger>
           <TabsTrigger value="teacher">教师信息</TabsTrigger>
+          <TabsTrigger value="students">学生名单</TabsTrigger>
         </TabsList>
 
         {/* 课程时间表 */}
@@ -256,6 +258,44 @@ export const CourseDetail: FC<CourseDetailProps> = ({
               </div>
             ) : (
               <p className="text-gray-500">暂无教师信息</p>
+            )}
+          </Card>
+        </TabsContent>
+
+        {/* 学生名单 */}
+        <TabsContent value="students" className="space-y-4">
+          <Card className="p-6">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-lg font-semibold">学生名单</h2>
+              <div className="text-sm text-gray-500">
+                共 {course.currentStudents || 0} 名学生
+                {course.maxStudents && ` / ${course.maxStudents}`}
+              </div>
+            </div>
+            {course.students && course.students.length > 0 ? (
+              <div className="space-y-4">
+                {course.students.map((student) => (
+                  <div
+                    key={student.id}
+                    className="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50"
+                  >
+                    <div className="flex items-center gap-3">
+                      <UserCircle className="w-8 h-8 text-gray-400" />
+                      <div className="space-y-1">
+                        <div className="font-medium">{student.name}</div>
+                        <div className="text-sm text-gray-500">{student.email}</div>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      {student.department && (
+                        <Badge variant="outline">{student.department}</Badge>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="text-gray-500">暂无学生信息</p>
             )}
           </Card>
         </TabsContent>

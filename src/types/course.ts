@@ -56,6 +56,7 @@ export interface Course {
   currentStudents?: number
   teacherId: string
   teacher?: User
+  students?: User[]
   createdAt: Date
   updatedAt: Date
   tasks?: Task[]
