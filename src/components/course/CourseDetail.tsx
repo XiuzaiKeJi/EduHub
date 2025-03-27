@@ -16,7 +16,9 @@ import {
   FileText,
   ListTodo,
   Edit,
-  Trash2
+  Trash2,
+  Mail,
+  Building2
 } from 'lucide-react'
 import { Course } from '@/types/course'
 
@@ -134,6 +136,7 @@ export const CourseDetail: FC<CourseDetailProps> = ({
           <TabsTrigger value="schedule">课程时间表</TabsTrigger>
           <TabsTrigger value="resources">课程资源</TabsTrigger>
           <TabsTrigger value="tasks">相关任务</TabsTrigger>
+          <TabsTrigger value="teacher">教师信息</TabsTrigger>
         </TabsList>
 
         {/* 课程时间表 */}
@@ -222,6 +225,37 @@ export const CourseDetail: FC<CourseDetailProps> = ({
               </div>
             ) : (
               <p className="text-gray-500">暂无相关任务</p>
+            )}
+          </Card>
+        </TabsContent>
+
+        {/* 教师信息 */}
+        <TabsContent value="teacher" className="space-y-4">
+          <Card className="p-6">
+            <h2 className="text-lg font-semibold mb-4">教师信息</h2>
+            {course.teacher ? (
+              <div className="space-y-4">
+                <div className="flex items-center gap-2">
+                  <User className="w-5 h-5 text-gray-500" />
+                  <span className="font-medium">{course.teacher.name}</span>
+                </div>
+                <div className="flex items-center gap-2 text-gray-600">
+                  <Mail className="w-5 h-5 text-gray-500" />
+                  <span>{course.teacher.email}</span>
+                </div>
+                {course.teacher.department && (
+                  <div className="flex items-center gap-2 text-gray-600">
+                    <Building2 className="w-5 h-5 text-gray-500" />
+                    <span>{course.teacher.department}</span>
+                  </div>
+                )}
+                <div className="flex items-center gap-2 text-gray-600">
+                  <GraduationCap className="w-5 h-5 text-gray-500" />
+                  <span>角色：{course.teacher.role === 'TEACHER' ? '教师' : course.teacher.role}</span>
+                </div>
+              </div>
+            ) : (
+              <p className="text-gray-500">暂无教师信息</p>
             )}
           </Card>
         </TabsContent>
