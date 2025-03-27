@@ -118,7 +118,7 @@
 ### 2. 教师管理模块
 
 #### 2.1 教师信息管理
-- [ ] 创建教师模型
+- [x] 创建教师模型
   - 任务描述：在prisma/schema.prisma中定义教师相关数据模型
   - 相关文件：prisma/schema.prisma, src/types/teacher.ts
   - 具体实现：创建Teacher模型，扩展User模型，包含id、userId、title、department、bio等字段
@@ -143,12 +143,29 @@
   - 完成说明：已创建TeacherEvaluation模型，用于存储对教师的评价信息，包含评分、评论内容、所属课程、学期等信息。在types目录下创建了对应的TypeScript接口定义，并完成了Prisma迁移。
 
 #### 2.2 教师API
-- [ ] 教师CRUD接口
+- [x] 教师CRUD接口
   - 任务描述：实现教师创建、读取、更新、删除API接口
   - 相关文件：src/app/api/teachers/route.ts, src/app/api/teachers/[id]/route.ts
   - 具体实现：创建RESTful API，支持教师信息的CRUD操作
   - 优先级：中
-  - 状态：进行中
+  - 状态：已完成
+  - 完成说明：实现了教师的CRUD API，包括教师的创建、查询、更新和删除功能。API路径为/api/teachers，支持分页、搜索和排序功能。对单个教师的操作在/api/teachers/[id]路径下实现，包括获取教师详情、更新教师信息和删除教师。所有接口均实现了权限验证和错误处理。
+
+- [x] 教师资质CRUD接口
+  - 任务描述：实现教师资质创建、读取、更新、删除API接口
+  - 相关文件：src/app/api/teachers/[id]/qualifications/route.ts, src/app/api/teachers/[id]/qualifications/[qualificationId]/route.ts
+  - 具体实现：创建RESTful API，支持教师资质的CRUD操作
+  - 优先级：中
+  - 状态：已完成
+  - 完成说明：实现了教师资质的CRUD API，包括资质的创建、查询、更新和删除功能。API路径为/api/teachers/[id]/qualifications，支持按教师ID筛选资质。对单个资质的操作在/api/teachers/[id]/qualifications/[qualificationId]路径下实现，包括资质详情查询、更新和删除。所有接口均实现了权限验证和错误处理。
+
+- [x] 教师评价CRUD接口
+  - 任务描述：实现教师评价创建、读取、更新、删除API接口
+  - 相关文件：src/app/api/teachers/[id]/evaluations/route.ts, src/app/api/teachers/[id]/evaluations/[evaluationId]/route.ts
+  - 具体实现：创建RESTful API，支持教师评价的CRUD操作
+  - 优先级：中
+  - 状态：已完成
+  - 完成说明：实现了教师评价的CRUD API，包括评价的创建、查询、更新和删除功能。API路径为/api/teachers/[id]/evaluations，支持按教师ID筛选评价。对单个评价的操作在/api/teachers/[id]/evaluations/[evaluationId]路径下实现，包括评价详情查询、更新和删除。所有接口均实现了权限验证和错误处理。
 
 ## 依赖关系
 
