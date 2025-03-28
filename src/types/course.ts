@@ -1,3 +1,5 @@
+import type { TeachingPlan } from './teaching-plan'
+
 export type CourseStatus = 'PLANNED' | 'IN_PROGRESS' | 'COMPLETED'
 
 export type CourseSortField = 'name' | 'startDate' | 'endDate' | 'currentStudents'
@@ -62,6 +64,7 @@ export interface Course {
   tasks?: Task[]
   schedules?: CourseSchedule[]
   resources?: CourseResource[]
+  teachingPlans?: TeachingPlan[]
 }
 
 export interface User {

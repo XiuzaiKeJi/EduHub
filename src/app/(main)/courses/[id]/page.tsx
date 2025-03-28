@@ -6,7 +6,7 @@ import { CourseDetail } from '@/components/courses/CourseDetail';
 
 interface CoursePageProps {
   params: {
-    courseId: string;
+    id: string;
   };
 }
 
@@ -17,7 +17,7 @@ export default async function CoursePage({ params }: CoursePageProps) {
   }
 
   const course = await prisma.course.findUnique({
-    where: { id: params.courseId },
+    where: { id: params.id },
     include: {
       category: true,
       teacher: {

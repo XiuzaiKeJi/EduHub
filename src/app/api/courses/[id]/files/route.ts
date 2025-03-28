@@ -6,7 +6,7 @@ import { uploadToStorage, deleteFromStorage } from '@/lib/storage';
 
 export async function POST(
   req: NextRequest,
-  { params }: { params: { courseId: string } }
+  { params }: { params: { id: string } }
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -40,7 +40,7 @@ export async function POST(
     }
 
     // 上传文件到存储
-    const fileUrl = await uploadToStorage(file, `courses/${params.courseId}`);
+    const fileUrl = await uploadToStorage(file, `courses/${params.id}`);
 
     // 保存文件信息到数据库
     const courseFile = await prisma.courseFile.create({
@@ -49,7 +49,7 @@ export async function POST(
         type: file.type,
         size: file.size,
         url: fileUrl,
-        courseId: params.courseId,
+        courseId: params.id,
       },
     });
 
@@ -62,7 +62,7 @@ export async function POST(
 
 export async function DELETE(
   req: NextRequest,
-  { params }: { params: { courseId: string } }
+  { params }: { params: { id: string } }
 ) {
   try {
     const session = await getServerSession(authOptions);

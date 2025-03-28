@@ -9,7 +9,7 @@ import { AlertModal } from '@/components/ui/alert-modal'
 
 export default function TeachersPage() {
   const router = useRouter()
-  const { toast } = useToast()
+  const { toast, ToastContainer } = useToast()
   
   const [teachers, setTeachers] = useState<Teacher[]>([])
   const [isLoading, setIsLoading] = useState(true)
@@ -204,6 +204,9 @@ export default function TeachersPage() {
         title="确认删除教师"
         description={`确定要删除教师 ${teacherToDelete?.user?.name || '未命名'} 吗？此操作无法撤销，所有关联的资质和评价也将被删除。`}
       />
+      
+      {/* Toast提示容器 */}
+      <ToastContainer />
     </div>
   )
 } 

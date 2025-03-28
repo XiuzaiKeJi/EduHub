@@ -198,6 +198,8 @@ model Course {
   files       CourseFile[]
   // 教师评价
   evaluations TeacherEvaluation[]
+  // 教学计划
+  teachingPlans TeachingPlan[]
 
   @@index([categoryId])
   @@index([teacherId])
@@ -311,4 +313,60 @@ model TeacherEvaluation {
   
   @@index([teacherId])
   @@index([courseId])
+}
+
+// 教学计划模型
+model TeachingPlan {
+  id          String    @id @default(cuid())
+  courseId    String
+  course      Course    @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  title       String
+  description String?
+  objectives  String?
+  semester    String?
+  academicYear String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  progress    TeachingPlanProgress[]
+  resources   TeachingPlanResource[]
+
+  @@index([courseId])
+}
+
+// 教学计划进度模型
+model TeachingPlanProgress {
+  id             String    @id @default(cuid())
+  planId         String
+  plan           TeachingPlan @relation(fields: [planId], references: [id], onDelete: Cascade)
+  title          String
+  description    String?
+  weekNumber     Int?
+  status         String    @default("PLANNED") // PLANNED, IN_PROGRESS, COMPLETED
+  completionRate Float     @default(0) // 0-100
+  startDate      DateTime?
+  endDate        DateTime?
+  note           String?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  @@index([planId])
+  @@index([status])
+}
+
+// 教学计划资源模型
+model TeachingPlanResource {
+  id          String    @id @default(cuid())
+  planId      String
+  plan        TeachingPlan @relation(fields: [planId], references: [id], onDelete: Cascade)
+  title       String
+  description String?
+  type        String    // 文档、视频、作业等
+  url         String
+  size        Int?
+  format      String?
+  order       Int       @default(0)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([planId])
 } 

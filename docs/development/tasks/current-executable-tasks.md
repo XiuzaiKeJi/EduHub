@@ -100,12 +100,52 @@
   - [x] 添加评价页面
   - [x] 编辑评价页面
 
+## 教学计划模块
+
+### 教学计划数据模型
+- [x] 实现TeachingPlan模型
+  - 实现TeachingPlan模型，包含id、courseId、title、description、objectives等字段
+- [x] 实现TeachingPlanProgress模型
+  - 实现TeachingPlanProgress模型，包含id、planId、title、status、completionRate等字段
+- [x] 实现TeachingPlanResource模型
+  - 实现TeachingPlanResource模型，包含id、planId、title、type、url等字段
+
+### 教学计划API
+- [x] 教学计划API
+  - [x] GET /api/courses/:id/teaching-plans - 查询教学计划列表
+  - [x] POST /api/courses/:id/teaching-plans - 创建教学计划
+  - [x] GET /api/courses/:id/teaching-plans/:planId - 查询单个教学计划
+  - [x] PATCH /api/courses/:id/teaching-plans/:planId - 更新教学计划
+  - [x] DELETE /api/courses/:id/teaching-plans/:planId - 删除教学计划
+- [x] 教学计划进度API
+  - [x] GET /api/courses/:id/teaching-plans/:planId/progress - 查询教学计划进度列表
+  - [x] POST /api/courses/:id/teaching-plans/:planId/progress - 创建教学计划进度
+  - [x] GET /api/courses/:id/teaching-plans/:planId/progress/:progressId - 查询单个教学计划进度
+  - [x] PATCH /api/courses/:id/teaching-plans/:planId/progress/:progressId - 更新教学计划进度
+  - [x] DELETE /api/courses/:id/teaching-plans/:planId/progress/:progressId - 删除教学计划进度
+- [x] 教学计划资源API
+  - [x] GET /api/courses/:id/teaching-plans/:planId/resources - 查询教学计划资源列表
+  - [x] POST /api/courses/:id/teaching-plans/:planId/resources - 创建教学计划资源
+  - [x] GET /api/courses/:id/teaching-plans/:planId/resources/:resourceId - 查询单个教学计划资源
+  - [x] PATCH /api/courses/:id/teaching-plans/:planId/resources/:resourceId - 更新教学计划资源
+  - [x] DELETE /api/courses/:id/teaching-plans/:planId/resources/:resourceId - 删除教学计划资源
+
+## 教学计划组件
+- [ ] 教学计划列表组件 (TeachingPlanList)
+- [ ] 教学计划卡片组件 (TeachingPlanCard)
+- [ ] 教学计划表单组件 (TeachingPlanForm)
+- [ ] 教学计划详情组件 (TeachingPlanDetail)
+- [ ] 教学计划进度组件 (TeachingPlanProgress)
+- [ ] 教学计划资源组件 (TeachingPlanResource)
+
 ## 依赖关系
 
 1. ~~首先完成数据模型设计：课程模型 -> 课程分类模型 -> 课程时间表模型 -> 课程资源模型~~ （已完成）
 2. ~~然后开发API接口：课程CRUD接口 -> 课程分类CRUD接口 -> 课程时间表CRUD接口 -> 课程资源CRUD接口~~ （已完成）
 3. ~~完成基本组件开发：课程列表组件 -> 课程表单组件 -> 课程详情组件~~ （已完成）
-4. 教师管理功能：教师模型 -> 教师API -> 教师组件
+4. ~~教师管理功能：教师模型 -> 教师API -> 教师组件~~ （已完成）
+5. ~~教学计划功能：教学计划模型 -> 教学计划API~~ （已完成）
+6. 教学计划组件：教学计划列表组件 -> 教学计划表单组件 -> 教学计划详情组件
 
 ## 注意事项
 
