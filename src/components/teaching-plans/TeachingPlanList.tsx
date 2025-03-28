@@ -9,7 +9,17 @@ import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { useDebounce } from '@/hooks/use-debounce'
 import { Pagination } from '@/components/ui/pagination'
-import { PlusIcon, Search, SlidersHorizontal } from 'lucide-react'
+import { PlusIcon, Search, SlidersHorizontal, Filter, MoreVertical } from 'lucide-react'
+import { Card } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Skeleton } from "@/components/ui/skeleton";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { toast } from "sonner";
 
 interface TeachingPlanListProps {
   courseId: string
@@ -55,6 +65,7 @@ const TeachingPlanList = ({ courseId }: TeachingPlanListProps) => {
     } catch (err) {
       console.error('获取教学计划列表出错:', err)
       setError(err instanceof Error ? err.message : '获取教学计划列表时出错')
+      toast.error('获取教学计划列表失败')
     } finally {
       setLoading(false)
     }
@@ -80,6 +91,24 @@ const TeachingPlanList = ({ courseId }: TeachingPlanListProps) => {
     setIsFiltersVisible(!isFiltersVisible)
   }
 
+  const handleDelete = async (planId: string) => {
+    try {
+      const response = await fetch(
+        `/api/courses/${courseId}/teaching-plans/${planId}`,
+        {
+          method: "DELETE",
+        }
+      );
+      if (!response.ok) {
+        throw new Error("删除教学计划失败");
+      }
+      toast.success("删除成功");
+      fetchPlans();
+    } catch (err) {
+      toast.error("删除失败");
+    }
+  };
+
   return (
     <div className="space-y-4">
       <div className="flex justify-between items-center">
@@ -101,7 +130,7 @@ const TeachingPlanList = ({ courseId }: TeachingPlanListProps) => {
           />
         </div>
         <Button variant="outline" size="icon" onClick={toggleFilters}>
-          <SlidersHorizontal className="h-4 w-4" />
+          <Filter className="h-4 w-4" />
         </Button>
       </div>
       
@@ -144,11 +173,53 @@ const TeachingPlanList = ({ courseId }: TeachingPlanListProps) => {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {plans.map((plan) => (
-            <TeachingPlanCard
-              key={plan.id}
-              plan={plan}
-              onClick={() => handleViewPlan(plan.id)}
-            />
+            <Card key={plan.id} className="p-4">
+              <div className="flex justify-between items-start">
+                <div className="space-y-1">
+                  <h3 className="font-medium">{plan.title}</h3>
+                  <p className="text-sm text-muted-foreground line-clamp-2">
+                    {plan.description}
+                  </p>
+                  <div className="flex gap-2">
+                    {plan.semester && (
+                      <Badge variant="secondary">{plan.semester}</Badge>
+                    )}
+                    {plan.academicYear && (
+                      <Badge variant="secondary">{plan.academicYear}</Badge>
+                    )}
+                  </div>
+                </div>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" size="icon">
+                      <MoreVertical className="h-4 w-4" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end">
+                    <DropdownMenuItem
+                      onClick={() =>
+                        router.push(`/courses/${courseId}/teaching-plans/${plan.id}`)
+                      }
+                    >
+                      查看详情
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() =>
+                        router.push(`/courses/${courseId}/teaching-plans/${plan.id}/edit`)
+                      }
+                    >
+                      编辑
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      className="text-red-600"
+                      onClick={() => handleDelete(plan.id)}
+                    >
+                      删除
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
+            </Card>
           ))}
         </div>
       )}
