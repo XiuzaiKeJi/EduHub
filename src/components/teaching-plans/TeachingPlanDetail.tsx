@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { TeachingPlan } from '@/types/teaching-plan'
 import { Button } from '@/components/ui/button'
@@ -9,56 +9,99 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Badge } from '@/components/ui/badge'
 import { formatDate } from '@/lib/utils'
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog'
-import { Calendar, Edit, Trash2, UploadCloud, ClipboardList } from 'lucide-react'
+import { Calendar, Edit, Trash2, UploadCloud, ClipboardList, MoreVertical } from 'lucide-react'
 import TeachingPlanProgressList from './TeachingPlanProgressList'
 import TeachingPlanResourceList from './TeachingPlanResourceList'
 import { toast } from '@/components/ui/use-toast'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Progress } from "@/components/ui/progress";
+import { FileText, Video, Book } from "lucide-react";
 
 interface TeachingPlanDetailProps {
   courseId: string
-  plan: TeachingPlan
+  planId: string
 }
 
-const TeachingPlanDetail = ({ courseId, plan }: TeachingPlanDetailProps) => {
+export function TeachingPlanDetail({ courseId, planId }: TeachingPlanDetailProps) {
   const router = useRouter()
+  const [plan, setPlan] = useState<TeachingPlan | null>(null)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
   const [isDeleting, setIsDeleting] = useState(false)
 
+  // 获取教学计划详情
+  useEffect(() => {
+    const fetchPlan = async () => {
+      try {
+        const response = await fetch(
+          `/api/courses/${courseId}/teaching-plans/${planId}`
+        )
+        if (!response.ok) {
+          throw new Error("获取教学计划失败")
+        }
+        const data = await response.json()
+        setPlan(data)
+      } catch (err) {
+        setError(err instanceof Error ? err.message : "获取教学计划失败")
+        toast.error("获取教学计划失败")
+      } finally {
+        setLoading(false)
+      }
+    }
+    fetchPlan()
+  }, [courseId, planId])
+
   const handleEdit = () => {
-    router.push(`/courses/${courseId}/teaching-plans/${plan.id}/edit`)
+    router.push(`/courses/${courseId}/teaching-plans/${planId}/edit`)
   }
 
   const handleDelete = async () => {
     setIsDeleting(true)
     
     try {
-      const response = await fetch(`/api/courses/${courseId}/teaching-plans/${plan.id}`, {
-        method: 'DELETE',
-      })
+      const response = await fetch(
+        `/api/courses/${courseId}/teaching-plans/${planId}`,
+        {
+          method: 'DELETE',
+        }
+      )
       
       if (!response.ok) {
-        const error = await response.json()
-        throw new Error(error.error || '删除失败')
+        throw new Error("删除教学计划失败")
       }
       
-      toast({
-        title: '教学计划已删除',
-        description: '成功删除教学计划',
-      })
-      
-      router.refresh()
+      toast.success("删除成功")
       router.push(`/courses/${courseId}/teaching-plans`)
-    } catch (error) {
-      console.error('删除教学计划出错:', error)
-      toast({
-        title: '删除失败',
-        description: error instanceof Error ? error.message : '删除教学计划时出错',
-        variant: 'destructive',
-      })
+    } catch (err) {
+      toast.error("删除失败")
     } finally {
       setIsDeleting(false)
       setIsDeleteDialogOpen(false)
     }
+  }
+
+  if (loading) {
+    return (
+      <div className="space-y-4">
+        <Skeleton className="h-8 w-1/4" />
+        <Skeleton className="h-32 w-full" />
+      </div>
+    )
+  }
+
+  if (error || !plan) {
+    return (
+      <div className="text-center py-8">
+        <p className="text-red-500">{error || "教学计划不存在"}</p>
+      </div>
+    )
   }
 
   return (
@@ -90,16 +133,26 @@ const TeachingPlanDetail = ({ courseId, plan }: TeachingPlanDetailProps) => {
           </div>
         </div>
         
-        <div className="flex space-x-2">
-          <Button variant="outline" size="sm" onClick={handleEdit}>
-            <Edit className="h-4 w-4 mr-2" />
-            编辑
-          </Button>
-          <Button variant="destructive" size="sm" onClick={() => setIsDeleteDialogOpen(true)}>
-            <Trash2 className="h-4 w-4 mr-2" />
-            删除
-          </Button>
-        </div>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="ghost" size="icon">
+              <MoreVertical className="h-4 w-4" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuItem
+              onClick={handleEdit}
+            >
+              编辑
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              className="text-red-600"
+              onClick={() => setIsDeleteDialogOpen(true)}
+            >
+              删除
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
       
       {plan.objectives && (
