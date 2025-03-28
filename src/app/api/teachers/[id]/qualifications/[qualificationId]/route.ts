@@ -2,49 +2,48 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { z } from 'zod'
 
-import { prisma } from '@/lib/prisma'
 import { authOptions } from '@/lib/auth'
+import { prisma } from '@/lib/db'
 
-// 定义资质更新验证模式
-const qualificationUpdateSchema = z.object({
+// 更新资质验证模式
+const updateQualificationSchema = z.object({
   name: z.string().min(1, '资质名称不能为空').optional(),
-  issuer: z.string().min(1, '发证机构不能为空').optional(),
-  issueDate: z.string().or(z.date()).transform(val => new Date(val)).optional(),
-  expiryDate: z.string().or(z.date()).transform(val => new Date(val)).optional().nullable(),
+  issuer: z.string().min(1, '颁发机构不能为空').optional(),
+  issueDate: z.string().transform((val) => new Date(val)).optional(),
+  expiryDate: z.string().optional().transform((val) => val ? new Date(val) : undefined),
   description: z.string().optional(),
   level: z.string().optional(),
   certificateNumber: z.string().optional(),
 })
 
-// GET 方法：获取单个资质
 export async function GET(
-  request: NextRequest,
-  { params }: { params: { id: string, qualificationId: string } }
+  req: NextRequest,
+  { params }: { params: { id: string; qualificationId: string } }
 ) {
   try {
-    // 获取会话信息，验证用户是否已登录
+    // 验证用户会话
     const session = await getServerSession(authOptions)
-    if (!session?.user) {
+    if (!session) {
       return NextResponse.json({ error: '未授权访问' }, { status: 401 })
     }
 
-    const { id, qualificationId } = params
+    const { id: teacherId, qualificationId } = params
 
-    // 验证教师是否存在
+    // 检查教师是否存在
     const teacher = await prisma.teacher.findUnique({
-      where: { id }
+      where: { id: teacherId },
     })
 
     if (!teacher) {
       return NextResponse.json({ error: '教师不存在' }, { status: 404 })
     }
 
-    // 获取资质信息
+    // 获取资质详情
     const qualification = await prisma.teacherQualification.findUnique({
       where: {
         id: qualificationId,
-        teacherId: id
-      }
+        teacherId,
+      },
     })
 
     if (!qualification) {
@@ -53,149 +52,125 @@ export async function GET(
 
     return NextResponse.json(qualification)
   } catch (error) {
-    console.error('获取资质信息失败:', error)
-    return NextResponse.json(
-      { error: '获取资质信息失败' },
-      { status: 500 }
-    )
+    console.error('获取资质详情失败:', error)
+    return NextResponse.json({ error: '获取资质详情失败' }, { status: 500 })
   }
 }
 
-// PATCH 方法：更新资质
 export async function PATCH(
-  request: NextRequest,
-  { params }: { params: { id: string, qualificationId: string } }
+  req: NextRequest,
+  { params }: { params: { id: string; qualificationId: string } }
 ) {
   try {
-    // 获取会话信息，验证用户是否已登录
+    // 验证用户会话
     const session = await getServerSession(authOptions)
-    if (!session?.user) {
+    if (!session) {
       return NextResponse.json({ error: '未授权访问' }, { status: 401 })
     }
 
-    const { id, qualificationId } = params
+    const { id: teacherId, qualificationId } = params
 
-    // 验证教师和资质是否存在
+    // 检查教师是否存在
     const teacher = await prisma.teacher.findUnique({
-      where: { id },
-      include: { user: true }
+      where: { id: teacherId },
     })
 
     if (!teacher) {
       return NextResponse.json({ error: '教师不存在' }, { status: 404 })
     }
 
+    // 检查资质是否存在
     const qualification = await prisma.teacherQualification.findUnique({
       where: {
         id: qualificationId,
-        teacherId: id
-      }
+        teacherId,
+      },
     })
 
     if (!qualification) {
       return NextResponse.json({ error: '资质不存在' }, { status: 404 })
     }
 
-    // 验证用户权限
-    // 只允许自己（如果是教师）、管理员或教职工更新资质
-    if (
-      session.user.id !== teacher.userId &&
-      session.user.role !== 'ADMIN' &&
-      session.user.role !== 'STAFF'
-    ) {
-      return NextResponse.json({ error: '权限不足' }, { status: 403 })
+    // 检查用户权限（管理员或教师本人）
+    if (session.user.role !== 'ADMIN' && session.user.id !== teacher.userId) {
+      return NextResponse.json({ error: '权限不足，无法更新此资质' }, { status: 403 })
     }
 
     // 解析请求体
-    const body = await request.json()
+    const body = await req.json()
     
-    // 验证请求数据
-    const validatedData = qualificationUpdateSchema.parse(body)
+    // 验证数据
+    const validatedData = updateQualificationSchema.parse(body)
 
     // 更新资质
     const updatedQualification = await prisma.teacherQualification.update({
       where: {
         id: qualificationId,
-        teacherId: id
+        teacherId,
       },
-      data: validatedData
+      data: validatedData,
     })
 
     return NextResponse.json(updatedQualification)
   } catch (error) {
-    console.error('更新资质信息失败:', error)
+    console.error('更新资质失败:', error)
     if (error instanceof z.ZodError) {
-      return NextResponse.json(
-        { error: '数据验证失败', details: error.errors },
-        { status: 400 }
-      )
+      return NextResponse.json({ error: '参数验证失败', details: error.errors }, { status: 400 })
     }
-    return NextResponse.json(
-      { error: '更新资质信息失败' },
-      { status: 500 }
-    )
+    return NextResponse.json({ error: '更新资质失败' }, { status: 500 })
   }
 }
 
-// DELETE 方法：删除资质
 export async function DELETE(
-  request: NextRequest,
-  { params }: { params: { id: string, qualificationId: string } }
+  req: NextRequest,
+  { params }: { params: { id: string; qualificationId: string } }
 ) {
   try {
-    // 获取会话信息，验证用户是否已登录
+    // 验证用户会话
     const session = await getServerSession(authOptions)
-    if (!session?.user) {
+    if (!session) {
       return NextResponse.json({ error: '未授权访问' }, { status: 401 })
     }
 
-    const { id, qualificationId } = params
+    const { id: teacherId, qualificationId } = params
 
-    // 验证教师和资质是否存在
+    // 检查教师是否存在
     const teacher = await prisma.teacher.findUnique({
-      where: { id },
-      include: { user: true }
+      where: { id: teacherId },
     })
 
     if (!teacher) {
       return NextResponse.json({ error: '教师不存在' }, { status: 404 })
     }
 
+    // 检查资质是否存在
     const qualification = await prisma.teacherQualification.findUnique({
       where: {
         id: qualificationId,
-        teacherId: id
-      }
+        teacherId,
+      },
     })
 
     if (!qualification) {
       return NextResponse.json({ error: '资质不存在' }, { status: 404 })
     }
 
-    // 验证用户权限
-    // 只允许自己（如果是教师）、管理员或教职工删除资质
-    if (
-      session.user.id !== teacher.userId &&
-      session.user.role !== 'ADMIN' &&
-      session.user.role !== 'STAFF'
-    ) {
-      return NextResponse.json({ error: '权限不足' }, { status: 403 })
+    // 检查用户权限（管理员或教师本人）
+    if (session.user.role !== 'ADMIN' && session.user.id !== teacher.userId) {
+      return NextResponse.json({ error: '权限不足，无法删除此资质' }, { status: 403 })
     }
 
     // 删除资质
     await prisma.teacherQualification.delete({
       where: {
         id: qualificationId,
-        teacherId: id
-      }
+        teacherId,
+      },
     })
 
-    return NextResponse.json({ message: '资质已成功删除' })
+    return NextResponse.json({ success: true })
   } catch (error) {
     console.error('删除资质失败:', error)
-    return NextResponse.json(
-      { error: '删除资质失败' },
-      { status: 500 }
-    )
+    return NextResponse.json({ error: '删除资质失败' }, { status: 500 })
   }
 } 
